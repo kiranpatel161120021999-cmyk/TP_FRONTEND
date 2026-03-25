@@ -7,7 +7,7 @@ import {
   FaCheckCircle, FaClock, FaCalendarAlt, FaTrophy, 
   FaSyncAlt, FaLaptopCode, FaChartLine, FaRupeeSign, FaGraduationCap, FaEdit
 } from "react-icons/fa";
-import "../style/studentDashboard.css";
+import "../style/StudentDashboard.css";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();

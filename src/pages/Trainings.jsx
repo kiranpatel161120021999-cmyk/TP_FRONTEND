@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaLaptopCode, FaClock, FaSearch, FaCode, FaServer, FaPaintBrush, FaGraduationCap } from 'react-icons/fa';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import '../style/training.css';
+import '../style/Training.css';
 
 import { TRAININGS_DATA as MOCK_TRAININGS } from '../data/trainings';
 

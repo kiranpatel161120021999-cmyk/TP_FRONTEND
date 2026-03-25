@@ -16,7 +16,7 @@ import {
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { TRAININGS_DATA } from '../data/trainings';
-import "../style/traingDetails.css";
+import "../style/trainingDetails.css";
 
 const TrainingDetails = () => {
   const { id } = useParams(); 

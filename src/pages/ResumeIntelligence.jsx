@@ -6,7 +6,7 @@ import {
 } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../style/resume-intelligence.css";
+import "../style/ResumeIntelligence.css";
 
 const ResumeIntelligence = () => {
   const [file, setFile] = useState(null);

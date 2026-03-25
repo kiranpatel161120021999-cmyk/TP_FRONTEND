@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUser, FaLock, FaEnvelope, FaCheck, FaTimes, FaArrowRight, FaGraduationCap, FaBook, FaCalendarAlt } from "react-icons/fa";
-import "../style/login.css";
+import "../style/Login.css";
 
 const Signup = () => {
   const [formData, setFormData] = useState({

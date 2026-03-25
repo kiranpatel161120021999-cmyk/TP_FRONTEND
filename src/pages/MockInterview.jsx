@@ -6,7 +6,7 @@ import {
   FaLightbulb, FaClock, FaStar, FaTrophy, FaChevronRight,
   FaCode, FaUsers, FaBrain, FaChartBar
 } from 'react-icons/fa';
-import '../style/mock-interview.css';
+import '../style/MockInterview.css';
 
 const CATEGORIES = [
   { id: 'hr', icon: <FaUsers />, label: 'HR Round', color: '#6d28d9', bg: '#f5f3ff', count: 20 },
