@@ -1,10 +1,11 @@
+//testing the remote push
 export const TRAININGS_DATA = [
-  { 
-    id: 1, 
-    title: "Java Full-Stack Development", 
-    subject: "Java", 
-    date: "03 Apr 2024", 
-    duration: "4 Weeks", 
+  {
+    id: 1,
+    title: "Java Full-Stack Development",
+    subject: "Java",
+    date: "03 Apr 2024",
+    duration: "4 Weeks",
     level: "Beginner",
     description: "Master enterprise Java development. Learn Core Java, Spring Boot, Hibernate, and build a full-fledged REST API backend connected to a MySQL database.",
     instructor: "Dr. Arvind Kumar",
@@ -22,12 +23,12 @@ export const TRAININGS_DATA = [
       { week: 4, title: "Database & Final Project", lessons: 3 }
     ]
   },
-  { 
-    id: 2, 
-    title: "PHP & Server-Side Scripting", 
-    subject: "PHP", 
-    date: "10 May 2024", 
-    duration: "3 Weeks", 
+  {
+    id: 2,
+    title: "PHP & Server-Side Scripting",
+    subject: "PHP",
+    date: "10 May 2024",
+    duration: "3 Weeks",
     level: "Beginner",
     description: "Learn the fundamentals of PHP, session management, and how to interact with MySQL databases to create dynamic, data-driven web pages.",
     instructor: "Prof. Rajesh Singh",
@@ -44,12 +45,12 @@ export const TRAININGS_DATA = [
       { week: 3, title: "Database Operations", lessons: 5 }
     ]
   },
-  { 
-    id: 3, 
-    title: "SIS Architecture with PHP", 
-    subject: "PHP", 
-    date: "17 May 2024", 
-    duration: "6 Weeks", 
+  {
+    id: 3,
+    title: "SIS Architecture with PHP",
+    subject: "PHP",
+    date: "17 May 2024",
+    duration: "6 Weeks",
     level: "Advanced",
     description: "A comprehensive project-based module focusing on building a Student Information System (SIS). Covers advanced PHP concepts, scalable architecture, and security practices.",
     instructor: "Prof. Rajesh Singh",
@@ -69,12 +70,12 @@ export const TRAININGS_DATA = [
       { week: 6, title: "Deployment & Maintenance", lessons: 2 }
     ]
   },
-  { 
-    id: 4, 
-    title: "ASP.NET Core Fundamentals", 
-    subject: "ASP", 
-    date: "25 May 2024", 
-    duration: "5 Weeks", 
+  {
+    id: 4,
+    title: "ASP.NET Core Fundamentals",
+    subject: "ASP",
+    date: "25 May 2024",
+    duration: "5 Weeks",
     level: "Intermediate",
     description: "Dive into building cross-platform, high-performance web applications using ASP.NET Core and C#.",
     instructor: "Mrs. Sneha Patel",
@@ -93,12 +94,12 @@ export const TRAININGS_DATA = [
       { week: 5, title: "Performance Testing", lessons: 2 }
     ]
   },
-  { 
-    id: 5, 
-    title: "React JS Frontend Mastery", 
-    subject: "React", 
-    date: "02 Jun 2024", 
-    duration: "6 Weeks", 
+  {
+    id: 5,
+    title: "React JS Frontend Mastery",
+    subject: "React",
+    date: "02 Jun 2024",
+    duration: "6 Weeks",
     level: "Intermediate",
     description: "Master modern React development. Build highly interactive, scalable Single Page Applications using Hooks, Context API, and state management.",
     instructor: "Mr. Dev Sharma",
@@ -118,12 +119,12 @@ export const TRAININGS_DATA = [
       { week: 6, title: "Deployment on Vercel/Netlify", lessons: 2 }
     ]
   },
-  { 
-    id: 6, 
-    title: "Node.js Backend & REST APIs", 
-    subject: "NodeJS", 
-    date: "08 Jun 2024", 
-    duration: "5 Weeks", 
+  {
+    id: 6,
+    title: "Node.js Backend & REST APIs",
+    subject: "NodeJS",
+    date: "08 Jun 2024",
+    duration: "5 Weeks",
     level: "Intermediate",
     description: "Learn to build fast, scalable network applications. Master asynchronous programming, Express.js framework, and MongoDB integration.",
     instructor: "Ms. Priya Desai",
@@ -142,12 +143,12 @@ export const TRAININGS_DATA = [
       { week: 5, title: "Error Handling & Logging", lessons: 3 }
     ]
   },
-  { 
-    id: 7, 
-    title: "React Native Mobile App", 
-    subject: "React", 
-    date: "15 Jun 2024", 
-    duration: "8 Weeks", 
+  {
+    id: 7,
+    title: "React Native Mobile App",
+    subject: "React",
+    date: "15 Jun 2024",
+    duration: "8 Weeks",
     level: "Advanced",
     description: "Learn to build truly native iOS and Android applications with one codebase using React Native and Expo.",
     instructor: "Mr. Dev Sharma",
@@ -169,12 +170,12 @@ export const TRAININGS_DATA = [
       { week: 8, title: "Build & Release", lessons: 3 }
     ]
   },
-  { 
-    id: 8, 
-    title: "Python Data Science Bootcamp", 
-    subject: "Python", 
-    date: "20 Jun 2024", 
-    duration: "10 Weeks", 
+  {
+    id: 8,
+    title: "Python Data Science Bootcamp",
+    subject: "Python",
+    date: "20 Jun 2024",
+    duration: "10 Weeks",
     level: "Beginner",
     description: "Master Python programming and explore Data Science libraries including Pandas, NumPy, Matplotlib, and scikit-learn for machine learning.",
     instructor: "Dr. Ananya Reddy",
@@ -198,12 +199,12 @@ export const TRAININGS_DATA = [
       { week: 10, title: "Final Capstone Project", lessons: 2 }
     ]
   },
-  { 
-    id: 9, 
-    title: "UI/UX Design Principles", 
-    subject: "Design", 
-    date: "01 Jul 2024", 
-    duration: "4 Weeks", 
+  {
+    id: 9,
+    title: "UI/UX Design Principles",
+    subject: "Design",
+    date: "01 Jul 2024",
+    duration: "4 Weeks",
     level: "Beginner",
     description: "Learn the core principles of user interface and user experience design. Master Figma to create stunning wireframes and interactive prototypes.",
     instructor: "Ms. Neha Gupta",
@@ -221,12 +222,12 @@ export const TRAININGS_DATA = [
       { week: 4, title: "User Testing & Handoff", lessons: 3 }
     ]
   },
-  { 
-    id: 10, 
-    title: "Advanced Java & Microservices", 
-    subject: "Java", 
-    date: "10 Jul 2024", 
-    duration: "6 Weeks", 
+  {
+    id: 10,
+    title: "Advanced Java & Microservices",
+    subject: "Java",
+    date: "10 Jul 2024",
+    duration: "6 Weeks",
     level: "Advanced",
     description: "Take your Java skills to the next level. Learn to architect and deploy resilient, distributed microservice applications using Spring Cloud and Docker.",
     instructor: "Dr. Arvind Kumar",
@@ -246,12 +247,12 @@ export const TRAININGS_DATA = [
       { week: 6, title: "Deployment Strategies", lessons: 2 }
     ]
   },
-  { 
-    id: 11, 
-    title: "Full-Stack Python with Django", 
-    subject: "Python", 
-    date: "15 Jul 2024", 
-    duration: "7 Weeks", 
+  {
+    id: 11,
+    title: "Full-Stack Python with Django",
+    subject: "Python",
+    date: "15 Jul 2024",
+    duration: "7 Weeks",
     level: "Intermediate",
     description: "Build robust web applications rapidly using the Django web framework. Learn ORM, Class-Based Views, and REST Framework.",
     instructor: "Dr. Ananya Reddy",
@@ -272,12 +273,12 @@ export const TRAININGS_DATA = [
       { week: 7, title: "Production Deployment", lessons: 2 }
     ]
   },
-  { 
-    id: 12, 
-    title: "Modern UI Engineering", 
-    subject: "Design", 
-    date: "22 Jul 2024", 
-    duration: "5 Weeks", 
+  {
+    id: 12,
+    title: "Modern UI Engineering",
+    subject: "Design",
+    date: "22 Jul 2024",
+    duration: "5 Weeks",
     level: "Advanced",
     description: "Bridge the gap between design and code. Learn advanced CSS, animations, accessibility, and how to build pixel-perfect react components.",
     instructor: "Ms. Neha Gupta",
