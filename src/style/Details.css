@@ -1,0 +1,89 @@
+/* ================================================
+   COURSE DETAILS STYLES (Details.jsx)
+   ================================================ */
+
+.course-details-page {
+  font-family: 'DM Sans', sans-serif;
+  background: #f8fafc;
+  color: #334155;
+  min-height: 100vh;
+}
+
+.cd-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* HERO */
+.cd-hero {
+  background: #0f172a;
+  padding: 60px 0 100px;
+  color: white;
+}
+.cd-badge {
+  display: inline-block; background: #6d28d9; color: white; padding: 6px 14px;
+  border-radius: 6px; font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px;
+}
+.cd-hero-left h1 { font-size: 38px; font-weight: 900; margin-bottom: 16px; line-height: 1.2; }
+.cd-hero-left p { font-size: 17px; color: #94a3b8; max-width: 700px; line-height: 1.7; margin-bottom: 24px; }
+
+.cd-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+.cd-meta span { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #cbd5e1; }
+
+/* MAIN SPLIT */
+.cd-main {
+  margin-top: -60px;
+  padding-bottom: 80px;
+}
+.cd-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* LEFT CONTENT */
+.cd-section-box {
+  background: white; border: 1px solid #e2e8f0; padding: 32px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.cd-section-box h2 { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 20px; }
+
+.cd-learn-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; }
+.cd-learn-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: #475569; line-height: 1.5; }
+.check-icon { margin-top: 3px; color: #10b981; flex-shrink: 0; }
+
+.cd-syllabus-list { display: flex; flex-direction: column; gap: 14px; }
+.syll-item { display: flex; align-items: center; gap: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; }
+.syll-week { font-weight: 800; color: #6d28d9; font-size: 14px; background: #f5f3ff; padding: 8px 16px; border-radius: 8px; }
+.syll-info h4 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.syll-info span { font-size: 13px; color: #64748b; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+/* RIGHT SIDEBAR */
+.cd-enroll-card {
+  background: white; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.06); position: sticky; top: 100px;
+}
+.enroll-img {
+  background: linear-gradient(135deg, #1e1b4b, #6d28d9); height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; cursor: pointer;
+}
+.enroll-play-icon { font-size: 48px; margin-bottom: 12px; transition: 0.2s; }
+.enroll-img:hover .enroll-play-icon { transform: scale(1.1); }
+.enroll-img p { font-size: 15px; font-weight: 700; }
+
+.enroll-body { padding: 24px; }
+.enroll-body h3 { font-size: 24px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+.enroll-body p { font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+
+.btn-enroll-primary {
+  display: block; text-align: center; width: 100%; background: #6d28d9; color: white; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 800; margin-bottom: 20px; transition: 0.2s; box-shadow: 0 4px 12px rgba(109,40,217,0.25);
+}
+.btn-enroll-primary:hover { background: #5b21b6; transform: translateY(-2px); }
+
+.enroll-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.enroll-features li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #475569; font-weight: 500; }
+.ef-icon { color: #6d28d9; }
+
+@media (max-width: 900px) {
+  .cd-grid { grid-template-columns: 1fr; }
+  .cd-learn-list { grid-template-columns: 1fr; }
+}

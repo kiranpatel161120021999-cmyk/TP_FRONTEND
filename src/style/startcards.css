@@ -1,0 +1,7 @@
+.card {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 200px;
+}

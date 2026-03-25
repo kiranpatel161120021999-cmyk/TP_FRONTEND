@@ -1,0 +1,335 @@
+/* 
+  login.css - Premium Auth Design System
+  Unified aesthetic for Login and Signup
+*/
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --auth-primary: #6366f1;
+  --auth-secondary: #ec4899;
+  --auth-bg: #f8fafc;
+  --auth-card-bg: rgba(255, 255, 255, 0.9);
+  --auth-text: #1e293b;
+  --auth-text-muted: #64748b;
+  --auth-border: #e2e8f0;
+  --auth-radius: 20px;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-jakarta);
+  background-color: var(--auth-bg);
+  color: var(--auth-text);
+  overflow-x: hidden;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 50%, #fdf2f8 100%);
+  padding: 20px;
+  position: relative;
+}
+
+/* Background Blobs */
+.blob {
+  position: absolute;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.5;
+  animation: float 10s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--auth-primary);
+  top: -100px;
+  left: -100px;
+}
+
+.blob-2 {
+  width: 300px;
+  height: 300px;
+  background: var(--auth-secondary);
+  bottom: -50px;
+  right: -50px;
+  animation-delay: -5s;
+}
+
+@keyframes float {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(30px, 30px) scale(1.1); }
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 1050px;
+  background: var(--auth-card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--auth-radius);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 10;
+  min-height: 650px;
+}
+
+/* Left Section: Form */
+.login-section {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-header {
+  margin-bottom: 32px;
+}
+
+.login-header h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: var(--auth-text-muted);
+  font-size: 15px;
+}
+
+/* Form Elements */
+.input-group {
+  margin-bottom: 24px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 16px;
+  color: #94a3b8;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.input-wrapper input, 
+.input-wrapper select {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  background: #f1f5f9;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1e293b;
+  transition: all 0.3s;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+  outline: none;
+  background: white;
+  border-color: var(--auth-primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.input-wrapper input:focus + i {
+  color: var(--auth-primary);
+}
+
+/* Auth Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--auth-primary), #4f46e5);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid var(--auth-border);
+  color: var(--auth-text);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--auth-text-muted);
+}
+
+.link {
+  color: var(--auth-primary);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+/* Right Section: Visual */
+.image-section {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(236, 72, 153, 0.8)), url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px;
+  color: white;
+}
+
+.overlay {
+  max-width: 400px;
+}
+
+.overlay h2 {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.overlay p {
+  font-size: 18px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* Popup Overlay */
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup-box {
+  background: white;
+  padding: 48px 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.popup-icon {
+  width: 80px;
+  height: 80px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 24px;
+}
+
+.popup-icon.error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.popup-box h3 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #0f172a;
+}
+
+.popup-box p {
+  color: var(--auth-text-muted);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.popup-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--auth-text);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.popup-btn:hover { background: #000; }
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .container { flex-direction: column; height: auto; }
+  .image-section { display: none; }
+  .login-section { padding: 40px 30px; }
+}

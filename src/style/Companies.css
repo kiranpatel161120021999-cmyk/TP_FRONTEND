@@ -1,0 +1,288 @@
+/* ============================================================
+   COMPANIES PAGE MASTERCLASS — Pixel Perfect SaaS Elite
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* HSL Modern Scale (Matched to Home Page) */
+  --p-h: 262; --p-s: 80%; --p-l: 58%;
+  --primary: hsl(var(--p-h), var(--p-s), var(--p-l));
+  --primary-light: hsl(var(--p-h), var(--p-s), 70%);
+  --primary-dark: hsl(var(--p-h), var(--p-s), 40%);
+  
+  --navy: #0f172a;
+  --navy-light: #1e293b;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --bg: #f8fafc;
+  --border: #f1f5f9;
+  
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.05);
+  --shadow-lg: 0 30px 60px rgba(109, 40, 217, 0.1);
+  
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.companies-page {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.comp-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ══════════════════════════────
+   ELITE MESH HERO
+──────────────────────────═══════ */
+.comp-hero {
+  position: relative;
+  background: var(--navy);
+  padding: 120px 0 140px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.comp-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle at 50% 50%, hsla(var(--p-h), 80%, 40%, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 20% 80%, hsla(199, 80%, 40%, 0.1) 0%, transparent 30%);
+  animation: meshFlow 20s linear infinite alternate;
+  pointer-events: none;
+}
+@keyframes meshFlow { 0% { transform: rotate(0); } 100% { transform: rotate(5deg) scale(1.1); } }
+
+.comp-hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+  color: white;
+}
+
+.comp-badge {
+  display: inline-flex;
+  align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 14px; font-weight: 700;
+  color: var(--primary-light);
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+}
+
+.comp-hero h1 {
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.comp-hero h1 span {
+  background: linear-gradient(135deg, white 0%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.comp-hero p {
+  font-size: 18px;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════────
+   PREMIUM SEARCH BAR
+──────────────────────────═══════ */
+.comp-search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 12px 24px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  max-width: 650px;
+  margin: 0 auto;
+  border: 4px solid rgba(255,255,255,0.05);
+  transition: var(--ease);
+}
+.comp-search-bar:focus-within { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0,0,0,0.4); border-color: var(--primary); }
+
+.search-icon { color: var(--primary); font-size: 22px; margin-right: 16px; }
+
+.comp-search-bar input {
+  flex: 1; border: none; outline: none;
+  font-size: 18px; font-weight: 500; color: var(--navy);
+  padding: 8px 0; background: transparent;
+  font-family: inherit;
+}
+.comp-search-bar input::placeholder { color: #94a3b8; }
+
+/* ══════════════════════════────
+   MAIN LAYOUT (DASHBOARD STYLE)
+──────────────────────────═══════ */
+.comp-main-sec {
+  padding: 0 0 100px;
+  margin-top: -60px;
+  position: relative;
+  z-index: 20;
+}
+
+.comp-content-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Filtering Sidebar */
+.comp-filter-sidebar {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  position: sticky; top: 120px;
+}
+
+.filter-group { margin-bottom: 32px; }
+.filter-group:last-child { margin-bottom: 0; }
+.filter-group h4 { font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 16px; }
+
+.filter-pill-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.filter-pill {
+  padding: 8px 16px; background: #f1f5f9; border-radius: 12px;
+  font-size: 13px; font-weight: 700; color: #475569;
+  cursor: pointer; transition: 0.3s;
+}
+.filter-pill:hover, .filter-pill.active { background: var(--primary); color: white; transform: translateY(-2px); }
+
+/* ══════════════════════════────
+   GLASS COMPANY CARDS
+──────────────────────────═══════ */
+.comp-header-row { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+.comp-header-row h2 { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.comp-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  border: 1px solid var(--border);
+  transition: all 0.5s var(--ease);
+  position: relative; overflow: hidden;
+}
+
+.comp-card:hover {
+  transform: translateY(-12px);
+  border-color: hsla(var(--p-h), var(--p-s), var(--p-l), 0.3);
+  box-shadow: var(--shadow-lg);
+}
+
+.comp-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.comp-logo-box {
+  width: 72px; height: 72px; background: white; border-radius: 18px;
+  border: 2px solid var(--border); padding: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: 0.4s var(--ease);
+}
+.comp-card:hover .comp-logo-box { border-color: var(--primary-light); transform: rotate(-5deg) scale(1.1); }
+.comp-logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.comp-tag {
+  background: #f5f3ff; color: var(--primary);
+  padding: 6px 14px; border-radius: 50px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+}
+
+.comp-name { font-size: 24px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.5px; }
+.comp-role { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 24px; }
+
+.comp-details-list {
+  background: #f8fafc; border-radius: 16px; padding: 20px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  margin-bottom: 32px;
+}
+
+.cd-item { display: flex; align-items: center; gap: 10px; }
+.cd-icon { color: var(--text-muted); font-size: 16px; }
+.cd-item span { font-size: 14px; font-weight: 600; color: #475569; }
+
+.comp-apply-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: var(--navy); color: white; font-weight: 800;
+  border: none; cursor: pointer; transition: 0.3s var(--ease);
+  letter-spacing: 0.5px;
+}
+.comp-card:hover .comp-apply-btn { background: var(--primary); transform: scale(1.02); box-shadow: 0 10px 30px hsla(var(--p-h), 80%, 40%, 0.3); }
+
+/* ══════════════════════════────
+   APPLICATION MODAL 2.0
+──────────────────────────═══════ */
+.comp-modal {
+  background: white; border-radius: 32px; border: none;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  padding: 48px 48px 32px; background: var(--navy); color: white;
+  display: flex; align-items: center; gap: 24px; border: none;
+}
+.modal-logo {
+  width: 72px; height: 72px; background: white; border-radius: 18px; padding: 12px;
+}
+
+.modal-form { padding: 48px; }
+.form-group label { color: var(--navy); font-size: 13px; font-weight: 900; }
+.form-group input { 
+  background: #f1f5f9; border: 2px solid transparent; padding: 16px;
+  border-radius: 12px; font-size: 16px; font-weight: 500;
+}
+.form-group input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 5px rgba(124, 58, 237, 0.15); }
+
+.modal-submit-btn {
+  background: var(--primary); padding: 16px 32px; font-size: 16px; letter-spacing: 0.5px;
+}
+
+/* Animations */
+.reveal-in {
+  opacity: 0; transform: translateY(40px);
+  animation: reveal 0.8s var(--ease) forwards;
+}
+@keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .comp-content-layout { grid-template-columns: 1fr; }
+  .comp-filter-sidebar { position: static; display: flex; overflow-x: auto; gap: 32px; padding: 24px; }
+  .filter-group { margin-bottom: 0; min-width: 200px; }
+}
+@media (max-width: 800px) {
+  .comp-grid { grid-template-columns: 1fr; }
+  .modal-form { padding: 24px; }
+  .modal-header { padding: 32px 24px; }
+}
