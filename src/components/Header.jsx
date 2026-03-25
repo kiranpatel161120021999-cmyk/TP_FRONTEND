@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../style/globalComponents.css';
+import '../style/GlobalComponents.css';
 
 const Header = () => {
   return (

@@ -3,7 +3,7 @@ import "./index.css";
 import AdminDashboard from "./pages/AdminDashboard";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import TrainingDetails from "./pages/training-details";
+import TrainingDetails from "./pages/TrainingDetails";
 import Details from "./pages/Details";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
