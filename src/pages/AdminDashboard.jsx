@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
-  FaUsers, FaBuilding, FaBriefcase, FaFileAlt, FaChartPie, 
-  FaChartBar, FaEdit, FaTrash, FaSignOutAlt, FaSearch, 
-  FaUserCircle, FaCog, FaBell, FaPlus, FaTrophy, 
-  FaArrowUp, FaArrowDown, FaBuilding as FaCompany,
-  FaTimes, FaChevronRight, FaUserGraduate, FaCalendarAlt
-} from "react-icons/fa";
+  FaUsers, FaBuilding, FaBriefcase, FaFileLines, FaChartPie, 
+  FaPenToSquare, FaTrash, FaRightFromBracket, FaMagnifyingGlass, 
+  FaGear, FaBell, FaPlus, FaChevronRight, 
+  FaUserGraduate, FaCalendarDays, FaRocket, FaGlobe,
+  FaArrowTrendUp, FaCheckDouble, FaXmark, FaArrowUpRightFromSquare
+} from "react-icons/fa6";
 
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, 
@@ -32,19 +32,22 @@ function AdminDashboard() {
   const [students, setStudents] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [jobs, setJobs] = useState([
-    { id: 1, role: "SDE Intern", company: "Google", location: "Bangalore", type: "Internship", applicants: 124, status: "Active" },
-    { id: 2, role: "Full Stack Developer", company: "Zomato", location: "Remote", type: "Full-Time", applicants: 89, status: "Closing Soon" }
+    { id: 1, role: "SDE Intern", company: "Google", location: "Bangalore", type: "Full-Time", applicants: 124, status: "Active", salary: "12 LPA" },
+    { id: 2, role: "Full Stack Dev", company: "Zomato", location: "Remote", type: "Intern", applicants: 89, status: "Closing", salary: "18 LPA" }
   ]);
-  const [applications, setApplications] = useState([
-    { id: 1, student: "Rahul Verma", company: "TCS", role: "Developer", status: "Selected", date: "12 Mar 2024" },
-    { id: 2, student: "Sneha Kapur", company: "Wipro", role: "Analyst", status: "Pending", date: "11 Mar 2024" },
-    { id: 3, student: "Amit Singh", company: "Infosys", role: "QA Engineer", status: "Rejected", date: "10 Mar 2024" }
+  const [drives, setDrives] = useState([
+    { id: 1, company: "Microsoft", date: "28 Mar 2024", type: "On-Campus", status: "Upcoming", package: "45 LPA" },
+    { id: 2, company: "Amazon", date: "15 Apr 2024", type: "Off-Campus", status: "Open", package: "32 LPA" }
   ]);
 
-  // Form States
+  // Form & UI States
   const [showAddModal, setShowAddModal] = useState(false);
-  const [modalType, setModalType] = useState(""); // 'student' or 'company'
+  const [modalType, setModalType] = useState(""); 
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
 
   // Search/Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,11 +61,11 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const [sRes, cRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/students"),
-        axios.get("http://localhost:5000/api/companies")
+        axios.get("http://localhost:5000/api/students").catch(() => ({ data: [] })),
+        axios.get("http://localhost:5000/api/companies").catch(() => ({ data: [] }))
       ]);
-      setStudents(sRes.data || []);
-      setCompanies(cRes.data || []);
+      setStudents(Array.isArray(sRes.data) ? sRes.data : []);
+      setCompanies(Array.isArray(cRes.data) ? cRes.data : []);
     } catch (err) {
       console.error("Fetch error:", err);
     } finally {
@@ -72,311 +75,347 @@ function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
-    localStorage.removeItem("userInfo");
     navigate("/");
   };
 
-  // --- Chart Configs ---
-  const barData = {
-    labels: ["CSE", "IT", "ECE", "MECH", "CIVIL"],
-    datasets: [{
-      label: 'Placements 2024',
-      data: [45, 38, 25, 15, 10],
-      backgroundColor: 'rgba(99, 102, 241, 0.8)',
-      borderRadius: 12,
-      borderSkipped: false,
-    }]
+  // --- Entity Handlers ---
+
+  const openForm = (type, mode = "add", data = {}) => {
+    setModalType(type);
+    setIsEditMode(mode === "edit");
+    setEditId(data._id || data.id || null);
+    setFormData(data);
+    setShowAddModal(true);
   };
 
-  const doughnutData = {
-    labels: ['Placed', 'Ongoing', 'Unplaced'],
-    datasets: [{
-      data: [65, 20, 15],
-      backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-      hoverOffset: 10,
-      borderWidth: 0
-    }]
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (modalType === 'company') {
+        if (isEditMode) {
+          await axios.put(`http://localhost:5000/api/companies/${editId}`, formData);
+        } else {
+          await axios.post("http://localhost:5000/api/companies/add", formData);
+        }
+      }
+      setShowAddModal(false);
+      setFormData({});
+      loadAllData();
+    } catch (err) {
+      console.error("Submit error:", err);
+    }
   };
 
-  // --- Render Helpers ---
+  const handleDelete = async (type, id) => {
+    if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
+      try {
+        if (type === 'company') await axios.delete(`http://localhost:5000/api/companies/${id}`);
+        loadAllData();
+      } catch (err) { console.error("Delete error:", err); }
+    }
+  };
+
+  // --- Render Sections ---
 
   const renderDashboard = () => (
-    <div className="animate-fade-in">
-      {/* Welcome Banner */}
-      <div className="premium-card" style={{
-        background: 'linear-gradient(135deg, var(--admin-primary), var(--admin-secondary))',
-        padding: '32px',
-        color: 'white',
-        marginBottom: '32px',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{position:'relative', zIndex: 1}}>
-          <h2 style={{fontSize:'28px', marginBottom:'8px'}}>Welcome back, Admin!</h2>
-          <p style={{opacity: 0.9, maxWidth: '500px'}}>The placement season is at its peak. You have 12 new company registrations and 45 student applications to review today.</p>
-        </div>
-        <FaChartBar style={{
-          position: 'absolute',
-          right: '-20px',
-          bottom: '-20px',
-          fontSize: '150px',
-          opacity: 0.1,
-          transform: 'rotate(-15deg)'
-        }} />
-      </div>
+    <div className="pro-content animate-fade-in">
+       <div className="pro-welcome-hero">
+          <div className="hero-text">
+             <h1>Good morning, Admin</h1>
+             <p>Placement season is active. You have <strong>12</strong> new registration requests.</p>
+          </div>
+          <div className="hero-actions">
+             <button className="pro-btn pro-btn-secondary"><FaFileLines /> Report 2024</button>
+             <button className="pro-btn pro-btn-primary" onClick={() => openForm('company')}><FaPlus /> Onboard Agency</button>
+          </div>
+       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="premium-stat-card">
-          <div className="stat-main">
-            <h4>Total Students</h4>
-            <div className="stat-value">{students.length || 0}</div>
-            <div className="stat-trend trend-up"><FaArrowUp /> 12% vs last month</div>
-          </div>
-          <div className="stat-icon-wrapper icon-purple"><FaUsers /></div>
-        </div>
-        <div className="premium-stat-card">
-          <div className="stat-main">
-            <h4>Partner Companies</h4>
-            <div className="stat-value">{companies.length || 0}</div>
-            <div className="stat-trend trend-up"><FaArrowUp /> 5 new this week</div>
-          </div>
-          <div className="stat-icon-wrapper icon-blue"><FaBuilding /></div>
-        </div>
-        <div className="premium-stat-card">
-          <div className="stat-main">
-            <h4>Active Job Roles</h4>
-            <div className="stat-value">{jobs.length}</div>
-            <div className="stat-trend trend-down"><FaArrowDown /> 2% vs yesterday</div>
-          </div>
-          <div className="stat-icon-wrapper icon-pink"><FaBriefcase /></div>
-        </div>
-        <div className="premium-stat-card">
-          <div className="stat-main">
-            <h4>Placement Rate</h4>
-            <div className="stat-value">85%</div>
-            <div className="stat-trend trend-up"><FaTrophy /> Goal reached</div>
-          </div>
-          <div className="stat-icon-wrapper icon-green"><FaArrowUp /></div>
-        </div>
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="premium-card">
-          <div className="card-header">
-            <h3>Department Performance</h3>
-            <div style={{display:'flex', gap:'8px'}}>
-               <span className="badge badge-info">2024 Batch</span>
-            </div>
-          </div>
-          <div className="chart-container">
-            <Bar data={barData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
-          </div>
-        </div>
-
-        <div className="premium-card">
-          <div className="card-header">
-            <h3>Placement Status</h3>
-          </div>
-          <div className="chart-container" style={{height:'300px', padding:'20px'}}>
-            <Doughnut data={doughnutData} options={{ maintainAspectRatio: false, cutout: '70%' }} />
-          </div>
-          <div style={{padding:'0 24px 24px'}}>
-             <div style={{display:'flex', justifyContent:'space-between', marginBottom:'12px'}}>
-                <span className="text-muted" style={{fontSize:'13px'}}>Placed Students</span>
-                <span style={{fontWeight:700}}>65%</span>
-             </div>
-             <div style={{width:'100%', height:'6px', background:'#f1f5f9', borderRadius:'3px'}}>
-                <div style={{width:'65%', height:'100%', background:'#10b981', borderRadius:'3px'}}></div>
+       <div className="pro-stats-strip">
+          <div className="pro-mini-card">
+             <div className="mini-icon icon-bg-blue"><FaUsers /></div>
+             <div className="mini-data">
+                <span className="label">Total Students</span>
+                <span className="value">{students.length}</span>
+                <span className="trend positive"><FaArrowTrendUp /> 12%</span>
              </div>
           </div>
-        </div>
-      </div>
+          <div className="pro-mini-card">
+             <div className="mini-icon icon-bg-green"><FaBuilding /></div>
+             <div className="mini-data">
+                <span className="label">Companies</span>
+                <span className="value">{companies.length}</span>
+                <span className="trend positive"><FaArrowTrendUp /> 5 new</span>
+             </div>
+          </div>
+          <div className="pro-mini-card">
+             <div className="mini-icon icon-bg-purple"><FaBriefcase /></div>
+             <div className="mini-data">
+                <span className="label">Active Jobs</span>
+                <span className="value">{jobs.length}</span>
+                <span className="trend">Stable</span>
+             </div>
+          </div>
+          <div className="pro-mini-card">
+             <div className="mini-icon icon-bg-orange"><FaCheckDouble /></div>
+             <div className="mini-data">
+                <span className="label">Placement rate</span>
+                <span className="value">84%</span>
+                <span className="trend positive">+2%</span>
+             </div>
+          </div>
+       </div>
+
+       <div className="pro-dashboard-grid">
+          <div className="pro-card pro-col-2">
+             <div className="pro-card-header">
+                <h3>Recruitment Velocity</h3>
+                <span className="pro-badge pro-badge-success">Live Season</span>
+             </div>
+             <div className="pro-chart-container">
+                <Line 
+                   data={{
+                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                     datasets: [{
+                        label: 'Interviews',
+                        data: [45, 59, 80, 81, 102],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                     }]
+                   }}
+                   options={{ maintainAspectRatio: false }}
+                />
+             </div>
+          </div>
+          <div className="pro-card">
+             <div className="pro-card-header">
+                <h3>Hiring Sources</h3>
+             </div>
+             <div className="pro-chart-container" style={{height:'300px'}}>
+                <Doughnut 
+                   data={{
+                      labels: ['On-Campus', 'Referral', 'Off-Campus'],
+                      datasets: [{
+                         data: [65, 20, 15],
+                         backgroundColor: ['#2563eb', '#9333ea', '#f59e0b'],
+                         borderWidth: 0
+                      }]
+                   }}
+                   options={{ maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }}
+                />
+             </div>
+          </div>
+       </div>
     </div>
   );
 
   const renderStudents = () => (
-    <div className="premium-card animate-fade-in shadow-lg">
-      <div className="card-header" style={{flexDirection:'column', alignItems:'stretch', gap:'20px'}}>
-        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-           <h2>Student Directory</h2>
-           <button className="btn-premium btn-primary" onClick={() => { setModalType('student'); setShowAddModal(true); }}>
-            <FaPlus /> Add New Student
-          </button>
-        </div>
-        
-        <div style={{display:'flex', gap:'16px', flexWrap:'wrap'}}>
-           <div className="search-box-header" style={{flex:'1', minWidth:'250px'}}>
-              <FaSearch className="search-nav-icon" />
-              <input 
-                type="text" 
-                className="search-input-header" 
-                placeholder="Search by name, email or roll..." 
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-           </div>
-           <select className="premium-input" style={{width:'200px'}} onChange={(e) => setFilterCourse(e.target.value)}>
-              <option value="All">All Departments</option>
-              <option value="CSE">CSE</option>
-              <option value="IT">IT</option>
-              <option value="ECE">ECE</option>
-           </select>
-        </div>
-      </div>
+    <div className="pro-content animate-fade-in">
+       <div className="pro-page-header">
+          <div className="page-info">
+             <h2>Student Directory</h2>
+             <p>Management of eligible student pool and academic history.</p>
+          </div>
+          <button className="pro-btn pro-btn-primary" onClick={() => openForm('student')}><FaPlus /> Add Student</button>
+       </div>
 
-      <div className="table-wrapper">
-        <table className="premium-table">
-          <thead>
-            <tr>
-              <th>Basic Info</th>
-              <th>Course & Batch</th>
-              <th>Progress</th>
-              <th>Contact</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(searchQuery || filterCourse !== "All" ? students.filter(s => 
-              (s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.email.toLowerCase().includes(searchQuery.toLowerCase())) &&
-              (filterCourse === "All" || s.course.includes(filterCourse))
-            ) : students).map(student => (
-              <tr key={student._id}>
-                <td>
-                   <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-                      <div className="nav-avatar" style={{width:'40px', height:'40px', fontSize:'14px'}}>
-                        {student.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="text-strong">{student.name}</div>
-                        <div className="text-muted text-xs">ID: ST-2024-00{student._id.slice(-2)}</div>
-                      </div>
-                   </div>
-                </td>
-                <td>
-                   <div className="text-strong">{student.course}</div>
-                   <div className="text-muted text-xs">{student.batch} Batch</div>
-                </td>
-                <td>
-                  <span className={`badge ${student.placed ? 'badge-success' : 'badge-info'}`}>
-                    {student.placed ? "Placed" : "Job Hunting"}
-                  </span>
-                </td>
-                <td>{student.email}</td>
-                <td>
-                   <div style={{display:'flex', gap:'8px'}}>
-                      <button className="btn-premium btn-outline btn-icon-only" title="Edit Profile"><FaEdit /></button>
-                      <button className="btn-premium btn-outline btn-icon-only" style={{color:'var(--admin-danger)'}} title="Delete"><FaTrash /></button>
-                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+       <div className="pro-card">
+          <div className="pro-table-controls">
+             <div className="pro-search">
+                <FaMagnifyingGlass />
+                <input type="text" placeholder="Search by name, roll or stream..." onChange={(e) => setSearchQuery(e.target.value)} />
+             </div>
+             <select className="pro-select" onChange={(e) => setFilterCourse(e.target.value)}>
+                <option value="All">All Departments</option>
+                <option value="CSE">CSE</option>
+                <option value="IT">IT</option>
+             </select>
+          </div>
+          <div className="pro-table-wrapper">
+             <table className="pro-table">
+                <thead>
+                   <tr>
+                      <th>Name</th>
+                      <th>Roll No</th>
+                      <th>Course</th>
+                      <th>Status</th>
+                      <th className="pro-text-right">Actions</th>
+                   </tr>
+                </thead>
+                <tbody>
+                   {students.filter(s => 
+                      ((s.name?.toLowerCase() || "").includes(searchQuery.toLowerCase())) &&
+                      (filterCourse === "All" || s.course?.includes(filterCourse))
+                   ).map(student => (
+                      <tr key={student._id}>
+                         <td>
+                            <div className="pro-user-cell">
+                               <div className="pro-avatar">{student.name?.charAt(0)}</div>
+                               <div className="pro-user-info">
+                                  <span className="name">{student.name}</span>
+                                  <span className="email">{student.email}</span>
+                               </div>
+                            </div>
+                         </td>
+                         <td><span className="pro-code">{student._id?.slice(-8).toUpperCase()}</span></td>
+                         <td><span className="pro-label">{student.course}</span></td>
+                         <td>
+                            <span className={`pro-status ${student.placed ? 'status-green' : 'status-blue'}`}>
+                               {student.placed ? 'Placed' : 'Ready'}
+                            </span>
+                         </td>
+                         <td className="pro-text-right">
+                            <div className="pro-cell-actions">
+                               <button className="pro-icon-btn" onClick={() => openForm('student', 'edit', student)}><FaPenToSquare /></button>
+                               <button className="pro-icon-btn danger" onClick={() => handleDelete('student', student._id)}><FaTrash /></button>
+                            </div>
+                         </td>
+                      </tr>
+                   ))}
+                </tbody>
+             </table>
+          </div>
+       </div>
     </div>
   );
 
   const renderCompanies = () => (
-    <div className="animate-fade-in">
-       <div className="page-header" style={{display:'flex', justifyContent:'space-between', marginBottom:'32px', alignItems:'center'}}>
-         <div>
-            <h2 style={{fontSize:'24px'}}>Company Ecosystem</h2>
-            <p className="text-muted">Manage corporate partners and campus drive history</p>
-         </div>
-         <button className="btn-premium btn-primary" onClick={() => { setModalType('company'); setShowAddModal(true); }}>
-           <FaPlus /> Direct Onload
-         </button>
+    <div className="pro-content animate-fade-in">
+       <div className="pro-page-header">
+          <div className="page-info">
+             <h2>Corporate Hub</h2>
+             <p>Oversee company partnerships and recruiter interactions.</p>
+          </div>
+          <button className="pro-btn pro-btn-primary" onClick={() => openForm('company')}><FaPlus /> Register Partner</button>
        </div>
 
-       <div className="companies-grid">
-         {companies.map(company => (
-           <div className="company-card-new" key={company._id}>
-              <div className="company-logo-large">
-                {company.logo ? <img src={company.logo} alt="" style={{width:'100%', height:'100%', borderRadius:'20px'}} /> : company.name.charAt(0)}
-              </div>
-              <h3>{company.name}</h3>
-              <p className="text-muted"><FaSearch style={{marginRight:'6px', verticalAlign:'middle'}} /> {company.location || "Global HQ"}</p>
-              
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', margin:'20px 0'}}>
-                 <div style={{padding:'10px', background:'#f8fafc', borderRadius:'12px'}}>
-                    <div style={{fontSize:'12px', color:'var(--admin-text-secondary)'}}>Open Jobs</div>
-                    <div style={{fontSize:'16px', fontWeight:700}}>04</div>
-                 </div>
-                 <div style={{padding:'10px', background:'#f8fafc', borderRadius:'12px'}}>
-                    <div style={{fontSize:'12px', color:'var(--admin-text-secondary)'}}>Hired</div>
-                    <div style={{fontSize:'16px', fontWeight:700}}>12</div>
-                 </div>
-              </div>
-
-              <div style={{display:'flex', gap:'12px'}}>
-                <button className="btn-premium btn-primary" style={{flex:1}}>Connect</button>
-                <button className="btn-premium btn-outline" style={{flex:1}}>Details</button>
-              </div>
-           </div>
-         ))}
-
-         {/* Empty State Card */}
-         <div className="company-card-new" style={{borderStyle:'dashed', display:'flex', flexDirection:'column', justifyContent:'center', minHeight:'300px'}}>
-            <div className="company-logo-large" style={{background:'var(--admin-bg)', border:'none'}}>
-               <FaPlus style={{color:'#94a3b8'}} />
-            </div>
-            <p className="text-muted">Register an new corporate partner to begin campus drives.</p>
-         </div>
+       <div className="pro-companies-grid">
+          {companies.map(company => (
+             <div className="pro-company-card" key={company._id}>
+                <div className="pro-card-top">
+                   <div className="pro-company-logo">
+                      {company.logo ? <img src={company.logo} alt="" /> : company.name?.charAt(0)}
+                   </div>
+                   <div className="pro-card-actions">
+                      <button className="pro-icon-btn" onClick={() => openForm('company', 'edit', company)}><FaPenToSquare /></button>
+                      <button className="pro-icon-btn danger" onClick={() => handleDelete('company', company._id)}><FaTrash /></button>
+                   </div>
+                </div>
+                <div className="pro-card-main">
+                   <h3>{company.name}</h3>
+                   <span className="location"><FaGlobe /> {company.location || 'Global'}</span>
+                </div>
+                <div className="pro-card-footer">
+                   <div className="pro-stat-item">
+                      <span className="val">12</span>
+                      <span className="lab">Hired</span>
+                   </div>
+                   <div className="pro-divider"></div>
+                   <div className="pro-stat-item">
+                      <span className="val">04</span>
+                      <span className="lab">Jobs</span>
+                   </div>
+                   <button className="pro-btn pro-btn-link" onClick={() => { setSelectedCompany(company); setShowAnalyticsModal(true); }}>
+                      Analytics <FaArrowUpRightFromSquare />
+                   </button>
+                </div>
+             </div>
+          ))}
+          <div className="pro-add-card" onClick={() => openForm('company')}>
+             <FaPlus />
+             <span>Add New Partner</span>
+          </div>
        </div>
     </div>
   );
 
   const renderJobs = () => (
-    <div className="animate-fade-in">
-      <div className="page-header" style={{display:'flex', justifyContent:'space-between', marginBottom:'24px'}}>
-        <h2>Active Job Postings</h2>
-        <button className="btn-premium btn-primary"><FaPlus /> Create Job</button>
-      </div>
-      
-      <div className="premium-card">
-         <div className="table-wrapper">
-            <table className="premium-table">
-               <thead>
-                 <tr>
-                   <th>Role & Company</th>
-                   <th>Location</th>
-                   <th>Type</th>
-                   <th>Applicants</th>
-                   <th>Status</th>
-                   <th>Actions</th>
-                 </tr>
-               </thead>
-               <tbody>
-                  {jobs.map(job => (
-                    <tr key={job.id}>
-                      <td>
-                         <div className="text-strong">{job.role}</div>
-                         <div className="text-muted text-xs">{job.company}</div>
-                      </td>
-                      <td>{job.location}</td>
-                      <td><span className="badge badge-info">{job.type}</span></td>
-                      <td>
-                         <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
-                            <div style={{flex:1, background:'#f1f5f9', height:'6px', borderRadius:'3px', minWidth:'60px'}}>
-                               <div style={{width:'70%', background:'var(--admin-primary)', height:'100%', borderRadius:'3px'}}></div>
+    <div className="pro-content animate-fade-in">
+       <div className="pro-page-header">
+          <div className="page-info">
+             <h2>Job Postings</h2>
+             <p>Monitor active vacancies and applicant volumes.</p>
+          </div>
+          <button className="pro-btn pro-btn-primary"><FaPlus /> Create Job</button>
+       </div>
+       <div className="pro-card">
+          <div className="pro-table-wrapper">
+             <table className="pro-table">
+                <thead>
+                   <tr>
+                      <th>Role</th>
+                      <th>Company</th>
+                      <th>Applicants</th>
+                      <th>Status</th>
+                      <th className="pro-text-right">Action</th>
+                   </tr>
+                </thead>
+                <tbody>
+                   {jobs.map(job => (
+                      <tr key={job.id}>
+                         <td><span className="pro-label">{job.role}</span></td>
+                         <td>{job.company}</td>
+                         <td>{job.applicants}</td>
+                         <td>
+                            <span className={`pro-status ${job.status === 'Active' ? 'status-green' : 'status-blue'}`}>{job.status}</span>
+                         </td>
+                         <td className="pro-text-right">
+                            <div className="pro-cell-actions">
+                               <button className="pro-icon-btn"><FaPenToSquare /></button>
+                               <button className="pro-icon-btn danger" onClick={() => setJobs(jobs.filter(j => j.id !== job.id))}><FaTrash /></button>
                             </div>
-                            <span style={{fontSize:'12px', fontWeight:600}}>{job.applicants}</span>
-                         </div>
-                      </td>
-                      <td>
-                         <span className={`badge ${job.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>
-                           {job.status}
-                         </span>
-                      </td>
-                      <td>
-                        <button className="btn-premium btn-outline btn-icon-only"><FaChevronRight /></button>
-                      </td>
-                    </tr>
-                  ))}
-               </tbody>
-            </table>
-         </div>
-      </div>
+                         </td>
+                      </tr>
+                   ))}
+                </tbody>
+             </table>
+          </div>
+       </div>
+    </div>
+  );
+
+  const renderDrives = () => (
+    <div className="pro-content animate-fade-in">
+       <div className="pro-page-header">
+          <div className="page-info">
+             <h2>Drive Cycles</h2>
+             <p>Scheduled campus recruitment and selection events.</p>
+          </div>
+          <button className="pro-btn pro-btn-primary"><FaPlus /> Schedule Drive</button>
+       </div>
+       <div className="pro-card">
+          <div className="pro-table-wrapper">
+             <table className="pro-table">
+                <thead>
+                   <tr>
+                      <th>Company</th>
+                      <th>Date</th>
+                      <th>Package</th>
+                      <th>Status</th>
+                   </tr>
+                </thead>
+                <tbody>
+                   {drives.map(drive => (
+                      <tr key={drive.id}>
+                         <td><span className="pro-label">{drive.company}</span></td>
+                         <td>{drive.date}</td>
+                         <td>{drive.package}</td>
+                         <td>
+                            <span className={`pro-status ${drive.status === 'Upcoming' ? 'status-blue' : 'status-green'}`}>{drive.status}</span>
+                         </td>
+                         <td className="pro-text-right">
+                            <div className="pro-cell-actions">
+                               <button className="pro-icon-btn"><FaPenToSquare /></button>
+                               <button className="pro-icon-btn danger"><FaTrash /></button>
+                            </div>
+                         </td>
+                      </tr>
+                   ))}
+                </tbody>
+             </table>
+          </div>
+       </div>
     </div>
   );
 
@@ -386,228 +425,161 @@ function AdminDashboard() {
       case "students": return renderStudents();
       case "companies": return renderCompanies();
       case "jobs": return renderJobs();
-      case "settings": return (
-        <div className="settings-container animate-fade-in">
-           <div className="page-header" style={{marginBottom:'32px'}}>
-              <h2 style={{fontSize:'28px'}}>Portal Settings</h2>
-              <p className="text-muted">Global configuration for Training & Placement platform</p>
-           </div>
-           
-           <div className="premium-card" style={{padding:'0'}}>
-              <div style={{padding:'32px', borderBottom:'1px solid var(--admin-border)'}}>
-                <h4 className="settings-section-title">Registration Controls</h4>
-                <div className="setting-row">
-                   <div className="setting-info">
-                     <h5>Public Student Registration</h5>
-                     <p>Allow new students to sign up via the public portal landing page</p>
-                   </div>
-                   <label className="switch">
-                     <input type="checkbox" defaultChecked />
-                     <span className="slider"></span>
-                   </label>
-                </div>
-                <div className="setting-row">
-                   <div className="setting-info">
-                     <h5>Automatic Profile Verification</h5>
-                     <p>Verify students automatically using their academic email domain</p>
-                   </div>
-                   <label className="switch">
-                     <input type="checkbox" />
-                     <span className="slider"></span>
-                   </label>
-                </div>
-              </div>
-
-              <div style={{padding:'32px'}}>
-                <h4 className="settings-section-title">Notification & Alerts</h4>
-                <div className="setting-row">
-                   <div className="setting-info">
-                     <h5>Job Posting Emails</h5>
-                     <p>Send automated HTML email alerts when companies post new roles</p>
-                   </div>
-                   <label className="switch">
-                     <input type="checkbox" defaultChecked />
-                     <span className="slider"></span>
-                   </label>
-                </div>
-                <div className="setting-row">
-                   <div className="setting-info">
-                     <h5>Admin Digest</h5>
-                     <p>Weekly performance report sent to administrator emails</p>
-                   </div>
-                   <label className="switch">
-                     <input type="checkbox" defaultChecked />
-                     <span className="slider"></span>
-                   </label>
-                </div>
-              </div>
-
-              <div style={{padding:'24px 32px', background:'#f8fafc', display:'flex', justifyContent:'flex-end'}}>
-                 <button className="btn-premium btn-primary">Save Platform Config</button>
-              </div>
-           </div>
+      case "drives": return renderDrives();
+      default: return (
+        <div className="pro-empty-state">
+           <FaRocket /> 
+           <h3>Module Under Construction</h3>
+           <p>This management module is currently being finalized for high-performance use.</p>
+           <button className="pro-btn pro-btn-primary" onClick={() => setPage('dashboard')}>Return to Overview</button>
         </div>
       );
-      default: return <div>Coming Soon...</div>;
     }
   };
 
   return (
-    <div className="admin-layout">
-      {/* Sidebar */}
-      <aside className="admin-sidebar shadow-2xl">
-        <div className="sidebar-header">
-           <div className="sidebar-logo">
-             <div className="logo-box">TP</div>
-             <div className="logo-text">Premium Portal</div>
-           </div>
-        </div>
+    <div className="pro-admin-layout">
+      {/* Sidebar V4 - Dark Pro */}
+      <aside className="pro-sidebar">
+         <div className="sidebar-brand">
+            <div className="brand-dot"></div>
+            <span>ADMIN <span>PRO</span></span>
+         </div>
+         
+         <div className="sidebar-section">
+            <span className="section-title">Insights</span>
+            <div className={`pro-sidebar-link ${page === 'dashboard' ? 'active' : ''}`} onClick={() => setPage('dashboard')}>
+               <FaChartPie /> <span>Dashboard</span>
+            </div>
+         </div>
 
-        <nav className="sidebar-nav">
-           <div className="nav-section-title">Analytics</div>
-           <ul className="nav-list">
-             <li className="nav-item">
-               <div className={`nav-link ${page === 'dashboard' ? 'active' : ''}`} onClick={() => setPage('dashboard')}>
-                  <FaChartPie className="nav-icon" /> Overview
-               </div>
-             </li>
-           </ul>
+         <div className="sidebar-section">
+            <span className="section-title">Management</span>
+            <div className={`pro-sidebar-link ${page === 'students' ? 'active' : ''}`} onClick={() => setPage('students')}>
+               <FaUserGraduate /> <span>Students</span>
+            </div>
+            <div className={`pro-sidebar-link ${page === 'companies' ? 'active' : ''}`} onClick={() => setPage('companies')}>
+               <FaBuilding /> <span>Companies</span>
+            </div>
+            <div className={`pro-sidebar-link ${page === 'jobs' ? 'active' : ''}`} onClick={() => setPage('jobs')}>
+               <FaBriefcase /> <span>Job Postings</span>
+            </div>
+            <div className={`pro-sidebar-link ${page === 'drives' ? 'active' : ''}`} onClick={() => setPage('drives')}>
+               <FaFileLines /> <span>Drive Cycles</span>
+            </div>
+         </div>
 
-           <div className="nav-section-title">Management</div>
-           <ul className="nav-list">
-             <li className="nav-item">
-               <div className={`nav-link ${page === 'students' ? 'active' : ''}`} onClick={() => setPage('students')}>
-                  <FaUserGraduate className="nav-icon" /> Students
-               </div>
-             </li>
-             <li className="nav-item">
-               <div className={`nav-link ${page === 'companies' ? 'active' : ''}`} onClick={() => setPage("companies")}>
-                  <FaBuilding className="nav-icon" /> Companies
-               </div>
-             </li>
-           </ul>
+         <div className="sidebar-section">
+            <span className="section-title">Preferences</span>
+            <div className={`pro-sidebar-link ${page === 'settings' ? 'active' : ''}`} onClick={() => setPage('settings')}>
+               <FaGear /> <span>Infrastructure</span>
+            </div>
+         </div>
 
-           <div className="nav-section-title">Ecosystem</div>
-           <ul className="nav-list">
-             <li className="nav-item">
-               <div className={`nav-link ${page === 'jobs' ? 'active' : ''}`} onClick={() => setPage('jobs')}>
-                 <FaBriefcase className="nav-icon" /> Job Postings
-               </div>
-             </li>
-             <li className="nav-item">
-               <div className="nav-link"><FaFileAlt className="nav-icon" /> Drive Cycles</div>
-             </li>
-           </ul>
-
-           <div className="nav-section-title">Settings</div>
-           <ul className="nav-list">
-             <li className="nav-item">
-               <div className={`nav-link ${page === 'settings' ? 'active' : ''}`} onClick={() => setPage('settings')}>
-                 <FaCog className="nav-icon" /> Configuration
-               </div>
-             </li>
-           </ul>
-        </nav>
-
-        <div className="sidebar-footer">
-           <button className="btn-premium btn-outline" style={{width:'100%', borderColor:'rgba(239, 68, 68, 0.4)', color:'#ef4444'}} onClick={handleLogout}>
-             <FaSignOutAlt /> Terminate Session
-           </button>
-        </div>
+         <div className="sidebar-footer">
+            <button className="pro-logout" onClick={handleLogout}>
+               <FaRightFromBracket /> <span>Exit Terminal</span>
+            </button>
+         </div>
       </aside>
 
-      {/* Main Container */}
-      <main className="admin-main">
-        <header className="admin-header shadow-sm">
-           <div className="header-left">
-             <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-                <div style={{width:'4px', height:'24px', background:'var(--admin-primary)', borderRadius:'2px'}}></div>
-                <h1 style={{textTransform:'capitalize'}}>{page} Control</h1>
-             </div>
-           </div>
-           <div className="header-right">
-              <div className="search-box-header">
-                <FaSearch className="search-nav-icon" />
-                <input type="text" className="search-input-header" placeholder="Global search..." />
-              </div>
-              
-              <div className="premium-card" style={{padding:'8px 12px', display:'flex', alignItems:'center', gap:'12px', border:'1px solid var(--admin-border)'}}>
-                 <FaBell style={{fontSize:'18px', color:'var(--admin-text-secondary)', cursor:'pointer'}} />
-                 <div style={{width:'1px', height:'20px', background:'var(--admin-border)'}}></div>
-                 <div className="user-profile-nav">
-                    <div className="nav-avatar" style={{width:'32px', height:'32px', fontSize:'12px', background:'var(--admin-primary)', color:'white'}}>AD</div>
-                    <div className="user-info-text" style={{display:'none'}}>
-                      <span style={{fontSize:'13px', fontWeight:'700'}}>Admin</span>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </header>
-
-        <div className="content-area">
-          {loading ? (
-            <div style={{height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'20px'}}>
-               <div className="spinner-modern"></div>
-               <p className="text-muted animate-pulse">Synchronizing platform data...</p>
+      <main className="pro-main">
+         <header className="pro-header">
+            <div className="pro-header-left">
+               <span className="pro-breadcrumb">Portal / Management / <span>{page}</span></span>
             </div>
-          ) : renderContent()}
-        </div>
+            <div className="pro-header-right">
+               <div className="pro-notif"><FaBell /> <div className="notif-dot"></div></div>
+               <div className="pro-divider-v"></div>
+               <div className="pro-user-chip">
+                  <div className="avatar">AD</div>
+                  <div className="details">
+                     <span className="name">Super Admin</span>
+                     <span className="role">Platform Master</span>
+                  </div>
+               </div>
+            </div>
+         </header>
+
+         <div className="pro-container">
+            {loading ? (
+               <div className="pro-loading">
+                  <div className="pro-spinner"></div>
+                  <p>Initializing secure protocol...</p>
+               </div>
+            ) : renderContent()}
+         </div>
       </main>
 
-      {/* Modals with Animation Overlay */}
-      {showAddModal && (
-        <div className="premium-overlay" onClick={() => setShowAddModal(false)}>
-           <div className="premium-modal" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-                   <div className="logo-box" style={{width:'32px', height:'32px', fontSize:'14px'}}>
-                      {modalType === 'student' ? <FaUserGraduate /> : <FaCompany />}
-                   </div>
-                   <h3 style={{fontSize:'20px'}}>{modalType === 'student' ? 'Register New Student' : 'Onboard Partner Company'}</h3>
-                </div>
-                <button className="btn-premium btn-outline btn-icon-only" onClick={() => setShowAddModal(false)}><FaTimes /></button>
-              </div>
-              <div className="modal-body">
-                <form className="premium-form">
-                   <div className="form-group">
-                      <label className="form-label">{modalType === 'student' ? 'Full Legal Name' : 'Registered Business Name'}</label>
-                      <input type="text" className="premium-input" placeholder="Type here..." required />
-                   </div>
-                   <div className="form-group">
-                      <label className="form-label">Professional Email Address</label>
-                      <input type="email" className="premium-input" placeholder="admin@domain.com" required />
-                   </div>
-                   {modalType === 'student' && (
-                     <div className="form-row">
-                        <div className="form-group">
-                          <label className="form-label">Academic Stream</label>
-                          <select className="premium-input">
-                             <option>B.Tech CSE</option>
-                             <option>B.Tech IT</option>
-                             <option>M.Tech AI</option>
-                             <option>MBA Marketing</option>
-                          </select>
-                        </div>
-                        <div className="form-group">
-                          <label className="form-label">Graduation Year</label>
-                          <input type="number" className="premium-input" defaultValue="2024" />
-                        </div>
+      {/* Corporate Analytics Modal */}
+      {showAnalyticsModal && selectedCompany && (
+         <div className="pro-overlay" onClick={() => setShowAnalyticsModal(false)}>
+            <div className="pro-modal pro-modal-lg" onClick={e => e.stopPropagation()}>
+               <div className="modal-header-v4">
+                  <div className="header-info">
+                     <h3>{selectedCompany.name} Analytics</h3>
+                     <p>Recruitment performance overview</p>
+                  </div>
+                  <button className="close-btn" onClick={() => setShowAnalyticsModal(false)}><FaXmark /></button>
+               </div>
+               <div className="modal-body-v4">
+                  <div className="pro-modal-stats">
+                     <div className="stat-unit">
+                        <span>Avg Package</span>
+                        <strong>14.2 LPA</strong>
                      </div>
-                   )}
-                   {modalType === 'company' && (
-                      <div className="form-group">
-                        <label className="form-label">Industry Sector</label>
-                        <input type="text" className="premium-input" placeholder="e.g. Fintech, SaaS, EdTech" />
-                      </div>
-                   )}
-                </form>
-              </div>
-              <div className="modal-footer" style={{background:'#f8fafc', borderBottomLeftRadius:'16px', borderBottomRightRadius:'16px'}}>
-                 <button className="btn-premium btn-outline" onClick={() => setShowAddModal(false)}>Discard</button>
-                 <button className="btn-premium btn-primary shadow-md">Complete Registration</button>
-              </div>
-           </div>
-        </div>
+                     <div className="stat-unit">
+                        <span>Offers Made</span>
+                        <strong>24</strong>
+                     </div>
+                     <div className="stat-unit">
+                        <span>Success Rate</span>
+                        <strong>18.4%</strong>
+                     </div>
+                  </div>
+                  <div className="modal-chart-v4">
+                     <Bar 
+                        data={{
+                           labels: ['2020', '2021', '2022', '2023', '2024'],
+                           datasets: [{
+                              label: 'Placements',
+                              data: [12, 19, 15, 25, 30],
+                              backgroundColor: '#2563eb',
+                              borderRadius: 4
+                           }]
+                        }} 
+                        options={{ maintainAspectRatio: false }}
+                     />
+                  </div>
+               </div>
+            </div>
+         </div>
+      )}
+
+      {/* Add/Edit Modal */}
+      {showAddModal && (
+         <div className="pro-overlay" onClick={() => setShowAddModal(false)}>
+            <div className="pro-modal" onClick={e => e.stopPropagation()}>
+               <div className="modal-header-v4">
+                  <h3>{isEditMode ? 'Modify' : 'Register'} {modalType}</h3>
+                  <button className="close-btn" onClick={() => setShowAddModal(false)}><FaXmark /></button>
+               </div>
+               <form className="modal-form-v4" onSubmit={handleSubmit}>
+                  <div className="form-group-v4">
+                     <label>Full Name / Identifier</label>
+                     <input type="text" value={formData.name || ""} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                  </div>
+                  <div className="form-group-v4">
+                     <label>Official Email</label>
+                     <input type="email" value={formData.email || ""} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                  </div>
+                  <div className="modal-actions-v4">
+                     <button type="button" className="pro-btn-subtle" onClick={() => setShowAddModal(false)}>Discard</button>
+                     <button type="submit" className="pro-btn-primary">{isEditMode ? 'Update Record' : 'Commit Entry'}</button>
+                  </div>
+               </form>
+            </div>
+         </div>
       )}
     </div>
   );

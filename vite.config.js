@@ -10,4 +10,17 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor-react';
+            if (id.includes('react-icons')) return 'vendor-icons';
+            return 'vendor';
+          }
+        }
+      }
+    }
+  }
 })

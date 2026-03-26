@@ -38,39 +38,34 @@ const Home = () => {
               <span>AI Tools Integration</span>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="mockup-container reveal-in reveal-d1">
-            <div className="hero-card-float hcf-1">
-              <div className="hcf-icon">📈</div>
-              <div>
-                <strong>98% Success</strong>
-                <p>Placement Accuracy</p>
+      {/* ═══ PLACEMENT STATS STRIP ═══ */}
+      <section className="stats-strip-sec">
+        <div className="home-container">
+          <div className="stats-strip-grid reveal-in">
+            <div className="stat-item">
+              <span className="stat-icon">💎</span>
+              <div className="stat-content">
+                <span className="stat-value">12.4 LPA</span>
+                <span className="stat-label">Average Package</span>
               </div>
             </div>
-            
-            <div className="dashboard-mockup">
-              <div style={{display:'flex', height:'100%'}}>
-                <div className="mock-content">
-                  <div style={{width:'150px',height:'20px',background:'#e2e8f0',marginBottom:'30px',borderRadius:'4px'}}></div>
-                  <div className="mock-grid">
-                    <div className="mock-card" style={{display:'flex',padding:'15px',gap:'10px',alignItems:'center'}}>
-                       <div style={{width:'40px',height:'40px',borderRadius:'8px',background:'#f1f5f9'}}></div>
-                       <div style={{flex:1}}><div style={{width:'80%',height:'8px',background:'#f1f5f9',marginBottom:'6px'}}></div><div style={{width:'50%',height:'8px',background:'#f1f5f9'}}></div></div>
-                    </div>
-                    <div className="mock-card" style={{display:'flex',padding:'15px',gap:'10px',alignItems:'center'}}>
-                       <div style={{width:'40px',height:'40px',borderRadius:'8px',background:'#f1f5f9'}}></div>
-                       <div style={{flex:1}}><div style={{width:'80%',height:'8px',background:'#f1f5f9',marginBottom:'6px'}}></div><div style={{width:'50%',height:'8px',background:'#f1f5f9'}}></div></div>
-                    </div>
-                  </div>
-                </div>
+            <div className="stat-separator"></div>
+            <div className="stat-item">
+              <span className="stat-icon">🔥</span>
+              <div className="stat-content">
+                <span className="stat-value">45+</span>
+                <span className="stat-label">Active Drives</span>
               </div>
             </div>
-
-            <div className="hero-card-float hcf-2">
-              <div className="hcf-icon">🏆</div>
-              <div>
-                <strong>Global Reach</strong>
-                <p>500+ Hiring Partners</p>
+            <div className="stat-separator"></div>
+            <div className="stat-item">
+              <span className="stat-icon">🌟</span>
+              <div className="stat-content">
+                <span className="stat-value">2500+</span>
+                <span className="stat-label">Placed Students</span>
               </div>
             </div>
           </div>
@@ -81,13 +76,14 @@ const Home = () => {
       <section className="features-section">
         <div className="home-container">
           <div className="sec-header reveal-in">
-            <span className="sec-badge">What We Offer</span>
+            <span className="sec-badge">Ecosystem Features</span>
             <h2>Everything to Get You Placed</h2>
             <p>A complete ecosystem built for ambitious students — from mastering core technical skills to signing your first offer letter.</p>
           </div>
 
           <div className="features-grid reveal-in reveal-d1">
             <div className="feat-card">
+              <div className="feat-pro-badge">Popular</div>
               <div className="feat-icon">
                 <i className="fa-solid fa-graduation-cap"></i>
               </div>
@@ -106,10 +102,11 @@ const Home = () => {
             </div>
 
             <div className="feat-card">
+              <div className="feat-pro-badge">AI Powered</div>
               <div className="feat-icon">
                 <i className="fa-solid fa-code-merge"></i>
               </div>
-              <h3>AI Intelligence</h3>
+              <h3>Resume Intelligence</h3>
               <p>Get your resume scored against industry benchmarks and receive real-time feedback for perfection.</p>
               <Link to="/resume-intelligence" className="feat-link">Check Score →</Link>
             </div>
@@ -149,6 +146,60 @@ const Home = () => {
         </div>
       </section>
 
+      {/* ═══ RECRUITER SHOWCASE ═══ */}
+      <section className="recruiter-sec">
+        <div className="home-container">
+          <div className="sec-header reveal-in">
+            <span className="sec-badge">Trust & Authority</span>
+            <h2>Top Hiring Partners</h2>
+          </div>
+          <div className="recruiter-marquee">
+            <div className="marquee-content">
+              {['Google', 'Amazon', 'Microsoft', 'Adobe', 'Meta', 'Netflix', 'Tesla', 'Apple'].map((c, i) => (
+                <div key={i} className="recruiter-logo">
+                  <span>{c}</span>
+                </div>
+              ))}
+              {/* Duplicate for infinite effect */}
+              {['Google', 'Amazon', 'Microsoft', 'Adobe', 'Meta', 'Netflix', 'Tesla', 'Apple'].map((c, i) => (
+                <div key={i+'d'} className="recruiter-logo">
+                  <span>{c}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TESTIMONIALS ═══ */}
+      <section className="testimonial-sec">
+        <div className="home-container">
+          <div className="sec-header reveal-in">
+            <span className="sec-badge">Success Stories</span>
+            <h2>Words from our Alumni</h2>
+          </div>
+          <div className="testi-grid reveal-in reveal-d1">
+            {[
+              { name: "Rahul Sharma", company: "Google", text: "The T&P Portal's AI tools were a game changer. The mock interviews felt like the real deal.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200" },
+              { name: "Sneha Patel", company: "Amazon", text: "From tracking applications to mastering DSA, everything I needed was in one place. Truly elite.", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" },
+              { name: "Vikram Singh", company: "Microsoft", text: "The expert bootcamps bridged the gap between my college syllabus and industry requirements.", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200" }
+            ].map((t, i) => (
+              <div key={i} className="testi-card">
+                <div className="testi-quote">"</div>
+                <p>{t.text}</p>
+                <div className="testi-author">
+                  <img src={t.img} alt={t.name} />
+                  <div>
+                    <h4>{t.name}</h4>
+                    <span>Placed at {t.company}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══ THE PROCESS ═══ */}
       <section className="steps-section">
         <div className="home-container">
@@ -157,11 +208,16 @@ const Home = () => {
             <h2>From Campus to Corporate</h2>
           </div>
           <div className="steps-row reveal-in reveal-d1">
-            {['Register', 'Skill Up', 'AI Prep', 'Get Offers'].map((s, i) => (
+            {[
+              { title: 'Register', desc: 'Create your elite profile' },
+              { title: 'Skill Up', desc: 'Master top technologies' },
+              { title: 'AI Prep', desc: 'Refine with AI mock tools' },
+              { title: 'Get Offers', desc: 'Sign your dream deal' }
+            ].map((s, i) => (
               <div className="step-box" key={i}>
                 <div className="step-num">0{i+1}</div>
-                <h4>{s}</h4>
-                <p>Simple and seamless transition to industry.</p>
+                <h4>{s.title}</h4>
+                <p>{s.desc}</p>
               </div>
             ))}
           </div>
