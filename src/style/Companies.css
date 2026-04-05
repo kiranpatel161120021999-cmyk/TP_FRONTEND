@@ -10,9 +10,9 @@
   --primary-light: hsl(var(--p-h), var(--p-s), 70%);
   --primary-dark: hsl(var(--p-h), var(--p-s), 40%);
   
-  --navy: #0f172a;
-  --navy-light: #1e293b;
-  --text: #1e293b;
+  --navy: #2e1065;
+  --navy-light: #3b0764;
+  --text: #3b0764;
   --text-muted: #64748b;
   --bg: #f8fafc;
   --border: #f1f5f9;

@@ -21,7 +21,7 @@
 /* ── HERO ── */
 .res-hero {
   position: relative;
-  background: #0f172a;
+  background: #2e1065;
   padding: 100px 0 160px;
   text-align: center;
   overflow: hidden;
@@ -137,7 +137,7 @@
 .res-dropzone h3 {
   font-size: 20px;
   font-weight: 800;
-  color: #1e293b;
+  color: #3b0764;
   margin-bottom: 8px;
 }
 .res-dropzone p {
@@ -148,7 +148,7 @@
 
 .res-browse-btn {
   display: inline-block;
-  background: #1e293b;
+  background: #3b0764;
   color: white;
   padding: 12px 28px;
   border-radius: 10px;
@@ -156,7 +156,7 @@
   cursor: pointer;
   transition: 0.2s;
 }
-.res-browse-btn:hover { background: #0f172a; transform: translateY(-2px); }
+.res-browse-btn:hover { background: #2e1065; transform: translateY(-2px); }
 
 /* File Info Tag */
 .res-file-info {
@@ -171,7 +171,7 @@
   margin: 0 auto;
 }
 .file-type-icon { font-size: 24px; color: #ef4444; }
-.file-name { font-weight: 700; color: #0f172a; font-size: 15px; }
+.file-name { font-weight: 700; color: #2e1065; font-size: 15px; }
 .file-size { font-size: 12px; font-weight: 600; color: #64748b; background: white; padding: 4px 8px; border-radius: 6px; }
 
 /* Action row */
@@ -238,7 +238,7 @@
 @keyframes pulseIcon { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
 @keyframes drawRing { to { stroke-dashoffset: 0; } }
 
-.res-scanning-wrap h3 { font-size: 22px; font-weight: 800; color: #1e293b; margin-bottom: 20px; }
+.res-scanning-wrap h3 { font-size: 22px; font-weight: 800; color: #3b0764; margin-bottom: 20px; }
 .res-scanning-wrap p { font-size: 15px; color: #64748b; max-width: 400px; margin: 0 auto; line-height: 1.6; }
 
 .res-progress-wrap {
@@ -269,11 +269,11 @@
 .rr-score-val {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.rr-score-val strong { font-size: 32px; font-weight: 900; color: #0f172a; line-height: 1; margin-bottom: 2px; }
+.rr-score-val strong { font-size: 32px; font-weight: 900; color: #2e1065; line-height: 1; margin-bottom: 2px; }
 .rr-score-val span { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; }
 
 .rr-summary { flex: 1; }
-.rr-summary h2 { font-size: 26px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+.rr-summary h2 { font-size: 26px; font-weight: 900; color: #2e1065; margin-bottom: 8px; }
 .rr-summary p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 16px; max-width: 400px; }
 
 .ats-badge {
@@ -294,7 +294,7 @@
 .rr-strengths { border-top: 4px solid #10b981; }
 .rr-weaknesses { border-top: 4px solid #ef4444; }
 
-.rr-card h4 { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.rr-card h4 { font-size: 16px; font-weight: 800; color: #2e1065; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .icon-green { color: #10b981; }
 .icon-red { color: #ef4444; }
 .icon-purple { color: #8b5cf6; }
@@ -325,7 +325,7 @@
 .ri-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
 .ri-card { background: white; padding: 30px; border-radius: 16px; border: 1px solid #e2e8f0; }
-.ri-card h3 { font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+.ri-card h3 { font-size: 17px; font-weight: 800; color: #2e1065; margin-bottom: 10px; }
 .ri-card p { font-size: 14px; color: #64748b; line-height: 1.7; }
 
 /* ── RESPONSIVE ── */

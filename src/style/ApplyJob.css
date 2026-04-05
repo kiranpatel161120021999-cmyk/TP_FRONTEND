@@ -5,7 +5,7 @@
   background-color: #f8fafc;
   padding: 60px 20px 100px; /* Improved vertical breathing room */
   font-family: 'Outfit', sans-serif;
-  color: #1e293b;
+  color: #3b0764;
 }
 
 .apply-layout {
@@ -43,7 +43,7 @@
 .header-text h1 {
   font-size: 28px;
   font-weight: 800;
-  color: #0f172a;
+  color: #2e1065;
   margin-bottom: 4px;
 }
 .header-text p {
@@ -112,11 +112,19 @@
   border-radius: 14px;
   border: 1px solid #e2e8f0;
   background: white;
+  color: #0f172a; /* Explicit dark text */
   font-family: 'Inter', sans-serif;
   font-size: 15px;
+  font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .form-group input:focus, 
@@ -249,7 +257,7 @@
 .review-item p {
   font-weight: 700;
   font-size: 16px;
-  color: #0f172a;
+  color: #2e1065;
 }
 .review-item.full {
   grid-column: span 2;
@@ -328,7 +336,7 @@
 .success-content h2 {
   font-size: 32px;
   font-weight: 900;
-  color: #0f172a;
+  color: #2e1065;
   margin-bottom: 10px;
 }
 .success-content p {

@@ -26,6 +26,8 @@ import DriveCycles from "./pages/DriveCycles";
 import CompanyProfile from "./pages/CompanyProfile";
 import MockInterview from "./pages/MockInterview";
 import CompanyDashboard from "./pages/CompanyDashboard";
+import Success from "./pages/Success";
+import Certificate from "./pages/Certificate";
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -53,6 +55,7 @@ function App() {
       {/* GENERAL */}
       <Route path="/about" element={<About />} />
       <Route path="/trainings" element={<Trainings />} />
+      <Route path="/training-details" element={<Navigate to="/trainings" replace />} />
       <Route path="/training-details/:id" element={<TrainingDetails />} />
       <Route path="/training-assignment/:id" element={<Details />} />
       <Route path="/training/:id" element={<TrainingDetails />} />
@@ -110,6 +113,8 @@ function App() {
     
 
       {/* OTHER */}
+      <Route path="/certificate/:id" element={<Certificate />} />
+      <Route path="/success/:id" element={<Success />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/java-mcq" element={<JavaMCQ />} />
       <Route path="/resume-intelligence" element={<ResumeIntelligence />} />

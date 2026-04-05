@@ -1,586 +1,399 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 import { 
-  FaUsers, FaBuilding, FaBriefcase, FaFileLines, FaChartPie, 
-  FaPenToSquare, FaTrash, FaRightFromBracket, FaMagnifyingGlass, 
-  FaGear, FaBell, FaPlus, FaChevronRight, 
-  FaUserGraduate, FaCalendarDays, FaRocket, FaGlobe,
-  FaArrowTrendUp, FaCheckDouble, FaXmark, FaArrowUpRightFromSquare
-} from "react-icons/fa6";
-
-import {
-  Chart as ChartJS, CategoryScale, LinearScale, BarElement, 
-  Title, Tooltip, Legend, ArcElement, PointElement, LineElement
-} from "chart.js";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-
-import "../style/AdminDashboard.css";
-
-// Register ChartJS plugins
-ChartJS.register(
-  CategoryScale, LinearScale, BarElement, Title, Tooltip, 
-  Legend, ArcElement, PointElement, LineElement
-);
+  FileText, Upload, Trash2, RefreshCcw, Search, CheckCircle, 
+  XCircle, Loader2, Users, Building, Briefcase, PieChart, 
+  Plus, Edit, Eye, Trash, LogOut, ChevronRight
+} from 'lucide-react';
+import { FaChartPie, FaUsers, FaBuilding, FaBriefcase, FaSignOutAlt, FaPlus, FaSearch } from "react-icons/fa";
+import "../style/StudentDashboard.css"; 
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [page, setPage] = useState("dashboard");
-  const [loading, setLoading] = useState(true);
-
-  // Data States
   const [students, setStudents] = useState([]);
   const [companies, setCompanies] = useState([]);
-  const [jobs, setJobs] = useState([
-    { id: 1, role: "SDE Intern", company: "Google", location: "Bangalore", type: "Full-Time", applicants: 124, status: "Active", salary: "12 LPA" },
-    { id: 2, role: "Full Stack Dev", company: "Zomato", location: "Remote", type: "Intern", applicants: 89, status: "Closing", salary: "18 LPA" }
-  ]);
-  const [drives, setDrives] = useState([
-    { id: 1, company: "Microsoft", date: "28 Mar 2024", type: "On-Campus", status: "Upcoming", package: "45 LPA" },
-    { id: 2, company: "Amazon", date: "15 Apr 2024", type: "Off-Campus", status: "Open", package: "32 LPA" }
-  ]);
+  const [trainings, setTrainings] = useState([]);
+  const [pdfs, setPdfs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTraining, setCurrentTraining] = useState({
+    title: "", subject: "", description: "", duration: "", 
+    startDate: "", price: "", language: "English", level: "Beginner"
+  });
 
-  // Form & UI States
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [modalType, setModalType] = useState(""); 
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState(null);
-
-  // Search/Filter State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCourse, setFilterCourse] = useState("All");
-
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const [sRes, cRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/students").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/companies").catch(() => ({ data: [] }))
+      const [stud, comp, train, pdfRes] = await Promise.all([
+        axios.get("http://localhost:5000/api/students"),
+        axios.get("http://localhost:5000/api/companies"),
+        axios.get("http://localhost:5000/api/trainings"),
+        axios.get("http://localhost:5000/api/syllabus")
       ]);
-      setStudents(Array.isArray(sRes.data) ? sRes.data : []);
-      setCompanies(Array.isArray(cRes.data) ? cRes.data : []);
-    } catch (err) {
-      console.error("Fetch error:", err);
+      setStudents(stud.data || []);
+      setCompanies(comp.data || []);
+      setTrainings(train.data || []);
+      setPdfs(pdfRes.data || []);
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to sync live data");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    navigate("/");
-  };
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  // --- Entity Handlers ---
-
-  const openForm = (type, mode = "add", data = {}) => {
-    setModalType(type);
-    setIsEditMode(mode === "edit");
-    setEditId(data._id || data.id || null);
-    setFormData(data);
-    setShowAddModal(true);
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSaveTraining = async (e) => {
     e.preventDefault();
+    const loadingToast = toast.loading("Saving training...");
     try {
-      if (modalType === 'company') {
-        if (isEditMode) {
-          await axios.put(`http://localhost:5000/api/companies/${editId}`, formData);
-        } else {
-          await axios.post("http://localhost:5000/api/companies/add", formData);
-        }
+      const payload = { ...currentTraining, price: Number(currentTraining.price) };
+      const res = await axios.post("http://localhost:5000/api/trainings/save", payload);
+      if (currentTraining._id) {
+        setTrainings(trainings.map(t => t._id === res.data._id ? res.data : t));
+        toast.success("Training updated!", { id: loadingToast });
+      } else {
+        setTrainings([...trainings, res.data]);
+        toast.success("New module launched!", { id: loadingToast });
       }
-      setShowAddModal(false);
-      setFormData({});
-      loadAllData();
-    } catch (err) {
-      console.error("Submit error:", err);
+      setIsModalOpen(false);
+      setCurrentTraining({ title: "", subject: "", description: "", duration: "", startDate: "", price: "", language: "English", level: "Beginner" });
+    } catch {
+      toast.error("Process failed", { id: loadingToast });
     }
   };
 
-  const handleDelete = async (type, id) => {
-    if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-      try {
-        if (type === 'company') await axios.delete(`http://localhost:5000/api/companies/${id}`);
-        loadAllData();
-      } catch (err) { console.error("Delete error:", err); }
+  const handleDeleteTraining = async (id) => {
+    if (!window.confirm("Delete this training module permanently?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/trainings/${id}`);
+      setTrainings(trainings.filter(t => t._id !== id));
+      toast.success("Module removed");
+    } catch {
+      toast.error("Deletion failed");
     }
   };
 
-  // --- Render Sections ---
+  const handleUploadSyllabus = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    setUploading(true);
+    const loadingToast = toast.loading("Uploading Syllabus...");
+    try {
+      const res = await axios.post("http://localhost:5000/api/syllabus/upload", formData);
+      setPdfs([res.data.data, ...pdfs]);
+      toast.success("Syllabus added!", { id: loadingToast });
+      e.target.reset();
+    } catch {
+      toast.error("Upload failed", { id: loadingToast });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePdf = async (id) => {
+    if (!window.confirm("Delete this syllabus?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/syllabus/${id}`);
+      setPdfs(pdfs.filter(p => p._id !== id));
+      toast.success("Syllabus removed");
+    } catch {
+      toast.error("Failed to delete");
+    }
+  };
 
   const renderDashboard = () => (
-    <div className="pro-content animate-fade-in">
-       <div className="pro-welcome-hero">
-          <div className="hero-text">
-             <h1>Good morning, Admin</h1>
-             <p>Placement season is active. You have <strong>12</strong> new registration requests.</p>
-          </div>
-          <div className="hero-actions">
-             <button className="pro-btn pro-btn-secondary"><FaFileLines /> Report 2024</button>
-             <button className="pro-btn pro-btn-primary" onClick={() => openForm('company')}><FaPlus /> Onboard Agency</button>
-          </div>
-       </div>
-
-       <div className="pro-stats-strip">
-          <div className="pro-mini-card">
-             <div className="mini-icon icon-bg-blue"><FaUsers /></div>
-             <div className="mini-data">
-                <span className="label">Total Students</span>
-                <span className="value">{students.length}</span>
-                <span className="trend positive"><FaArrowTrendUp /> 12%</span>
-             </div>
-          </div>
-          <div className="pro-mini-card">
-             <div className="mini-icon icon-bg-green"><FaBuilding /></div>
-             <div className="mini-data">
-                <span className="label">Companies</span>
-                <span className="value">{companies.length}</span>
-                <span className="trend positive"><FaArrowTrendUp /> 5 new</span>
-             </div>
-          </div>
-          <div className="pro-mini-card">
-             <div className="mini-icon icon-bg-purple"><FaBriefcase /></div>
-             <div className="mini-data">
-                <span className="label">Active Jobs</span>
-                <span className="value">{jobs.length}</span>
-                <span className="trend">Stable</span>
-             </div>
-          </div>
-          <div className="pro-mini-card">
-             <div className="mini-icon icon-bg-orange"><FaCheckDouble /></div>
-             <div className="mini-data">
-                <span className="label">Placement rate</span>
-                <span className="value">84%</span>
-                <span className="trend positive">+2%</span>
-             </div>
-          </div>
-       </div>
-
-       <div className="pro-dashboard-grid">
-          <div className="pro-card pro-col-2">
-             <div className="pro-card-header">
-                <h3>Recruitment Velocity</h3>
-                <span className="pro-badge pro-badge-success">Live Season</span>
-             </div>
-             <div className="pro-chart-container">
-                <Line 
-                   data={{
-                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                     datasets: [{
-                        label: 'Interviews',
-                        data: [45, 59, 80, 81, 102],
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                     }]
-                   }}
-                   options={{ maintainAspectRatio: false }}
-                />
-             </div>
-          </div>
-          <div className="pro-card">
-             <div className="pro-card-header">
-                <h3>Hiring Sources</h3>
-             </div>
-             <div className="pro-chart-container" style={{height:'300px'}}>
-                <Doughnut 
-                   data={{
-                      labels: ['On-Campus', 'Referral', 'Off-Campus'],
-                      datasets: [{
-                         data: [65, 20, 15],
-                         backgroundColor: ['#2563eb', '#9333ea', '#f59e0b'],
-                         borderWidth: 0
-                      }]
-                   }}
-                   options={{ maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }}
-                />
-             </div>
-          </div>
-       </div>
-    </div>
-  );
-
-  const renderStudents = () => (
-    <div className="pro-content animate-fade-in">
-       <div className="pro-page-header">
-          <div className="page-info">
-             <h2>Student Directory</h2>
-             <p>Management of eligible student pool and academic history.</p>
-          </div>
-          <button className="pro-btn pro-btn-primary" onClick={() => openForm('student')}><FaPlus /> Add Student</button>
-       </div>
-
-       <div className="pro-card">
-          <div className="pro-table-controls">
-             <div className="pro-search">
-                <FaMagnifyingGlass />
-                <input type="text" placeholder="Search by name, roll or stream..." onChange={(e) => setSearchQuery(e.target.value)} />
-             </div>
-             <select className="pro-select" onChange={(e) => setFilterCourse(e.target.value)}>
-                <option value="All">All Departments</option>
-                <option value="CSE">CSE</option>
-                <option value="IT">IT</option>
-             </select>
-          </div>
-          <div className="pro-table-wrapper">
-             <table className="pro-table">
-                <thead>
-                   <tr>
-                      <th>Name</th>
-                      <th>Roll No</th>
-                      <th>Course</th>
-                      <th>Status</th>
-                      <th className="pro-text-right">Actions</th>
-                   </tr>
-                </thead>
-                <tbody>
-                   {students.filter(s => 
-                      ((s.name?.toLowerCase() || "").includes(searchQuery.toLowerCase())) &&
-                      (filterCourse === "All" || s.course?.includes(filterCourse))
-                   ).map(student => (
-                      <tr key={student._id}>
-                         <td>
-                            <div className="pro-user-cell">
-                               <div className="pro-avatar">{student.name?.charAt(0)}</div>
-                               <div className="pro-user-info">
-                                  <span className="name">{student.name}</span>
-                                  <span className="email">{student.email}</span>
-                               </div>
-                            </div>
-                         </td>
-                         <td><span className="pro-code">{student._id?.slice(-8).toUpperCase()}</span></td>
-                         <td><span className="pro-label">{student.course}</span></td>
-                         <td>
-                            <span className={`pro-status ${student.placed ? 'status-green' : 'status-blue'}`}>
-                               {student.placed ? 'Placed' : 'Ready'}
-                            </span>
-                         </td>
-                         <td className="pro-text-right">
-                            <div className="pro-cell-actions">
-                               <button className="pro-icon-btn" onClick={() => openForm('student', 'edit', student)}><FaPenToSquare /></button>
-                               <button className="pro-icon-btn danger" onClick={() => handleDelete('student', student._id)}><FaTrash /></button>
-                            </div>
-                         </td>
-                      </tr>
-                   ))}
-                </tbody>
-             </table>
-          </div>
-       </div>
-    </div>
-  );
-
-  const renderCompanies = () => (
-    <div className="pro-content animate-fade-in">
-       <div className="pro-page-header">
-          <div className="page-info">
-             <h2>Corporate Hub</h2>
-             <p>Oversee company partnerships and recruiter interactions.</p>
-          </div>
-          <button className="pro-btn pro-btn-primary" onClick={() => openForm('company')}><FaPlus /> Register Partner</button>
-       </div>
-
-       <div className="pro-companies-grid">
-          {companies.map(company => (
-             <div className="pro-company-card" key={company._id}>
-                <div className="pro-card-top">
-                   <div className="pro-company-logo">
-                      {company.logo ? <img src={company.logo} alt="" /> : company.name?.charAt(0)}
-                   </div>
-                   <div className="pro-card-actions">
-                      <button className="pro-icon-btn" onClick={() => openForm('company', 'edit', company)}><FaPenToSquare /></button>
-                      <button className="pro-icon-btn danger" onClick={() => handleDelete('company', company._id)}><FaTrash /></button>
-                   </div>
-                </div>
-                <div className="pro-card-main">
-                   <h3>{company.name}</h3>
-                   <span className="location"><FaGlobe /> {company.location || 'Global'}</span>
-                </div>
-                <div className="pro-card-footer">
-                   <div className="pro-stat-item">
-                      <span className="val">12</span>
-                      <span className="lab">Hired</span>
-                   </div>
-                   <div className="pro-divider"></div>
-                   <div className="pro-stat-item">
-                      <span className="val">04</span>
-                      <span className="lab">Jobs</span>
-                   </div>
-                   <button className="pro-btn pro-btn-link" onClick={() => { setSelectedCompany(company); setShowAnalyticsModal(true); }}>
-                      Analytics <FaArrowUpRightFromSquare />
-                   </button>
-                </div>
-             </div>
-          ))}
-          <div className="pro-add-card" onClick={() => openForm('company')}>
-             <FaPlus />
-             <span>Add New Partner</span>
-          </div>
-       </div>
-    </div>
-  );
-
-  const renderJobs = () => (
-    <div className="pro-content animate-fade-in">
-       <div className="pro-page-header">
-          <div className="page-info">
-             <h2>Job Postings</h2>
-             <p>Monitor active vacancies and applicant volumes.</p>
-          </div>
-          <button className="pro-btn pro-btn-primary"><FaPlus /> Create Job</button>
-       </div>
-       <div className="pro-card">
-          <div className="pro-table-wrapper">
-             <table className="pro-table">
-                <thead>
-                   <tr>
-                      <th>Role</th>
-                      <th>Company</th>
-                      <th>Applicants</th>
-                      <th>Status</th>
-                      <th className="pro-text-right">Action</th>
-                   </tr>
-                </thead>
-                <tbody>
-                   {jobs.map(job => (
-                      <tr key={job.id}>
-                         <td><span className="pro-label">{job.role}</span></td>
-                         <td>{job.company}</td>
-                         <td>{job.applicants}</td>
-                         <td>
-                            <span className={`pro-status ${job.status === 'Active' ? 'status-green' : 'status-blue'}`}>{job.status}</span>
-                         </td>
-                         <td className="pro-text-right">
-                            <div className="pro-cell-actions">
-                               <button className="pro-icon-btn"><FaPenToSquare /></button>
-                               <button className="pro-icon-btn danger" onClick={() => setJobs(jobs.filter(j => j.id !== job.id))}><FaTrash /></button>
-                            </div>
-                         </td>
-                      </tr>
-                   ))}
-                </tbody>
-             </table>
-          </div>
-       </div>
-    </div>
-  );
-
-  const renderDrives = () => (
-    <div className="pro-content animate-fade-in">
-       <div className="pro-page-header">
-          <div className="page-info">
-             <h2>Drive Cycles</h2>
-             <p>Scheduled campus recruitment and selection events.</p>
-          </div>
-          <button className="pro-btn pro-btn-primary"><FaPlus /> Schedule Drive</button>
-       </div>
-       <div className="pro-card">
-          <div className="pro-table-wrapper">
-             <table className="pro-table">
-                <thead>
-                   <tr>
-                      <th>Company</th>
-                      <th>Date</th>
-                      <th>Package</th>
-                      <th>Status</th>
-                   </tr>
-                </thead>
-                <tbody>
-                   {drives.map(drive => (
-                      <tr key={drive.id}>
-                         <td><span className="pro-label">{drive.company}</span></td>
-                         <td>{drive.date}</td>
-                         <td>{drive.package}</td>
-                         <td>
-                            <span className={`pro-status ${drive.status === 'Upcoming' ? 'status-blue' : 'status-green'}`}>{drive.status}</span>
-                         </td>
-                         <td className="pro-text-right">
-                            <div className="pro-cell-actions">
-                               <button className="pro-icon-btn"><FaPenToSquare /></button>
-                               <button className="pro-icon-btn danger"><FaTrash /></button>
-                            </div>
-                         </td>
-                      </tr>
-                   ))}
-                </tbody>
-             </table>
-          </div>
-       </div>
-    </div>
-  );
-
-  const renderContent = () => {
-    switch (page) {
-      case "dashboard": return renderDashboard();
-      case "students": return renderStudents();
-      case "companies": return renderCompanies();
-      case "jobs": return renderJobs();
-      case "drives": return renderDrives();
-      default: return (
-        <div className="pro-empty-state">
-           <FaRocket /> 
-           <h3>Module Under Construction</h3>
-           <p>This management module is currently being finalized for high-performance use.</p>
-           <button className="pro-btn pro-btn-primary" onClick={() => setPage('dashboard')}>Return to Overview</button>
+    <div className="dash-body animate-in">
+      <div className="page-header">
+        <div className="header-info">
+          <h2>Executive Dashboard</h2>
+          <p>Global Training & Placement Overview</p>
         </div>
-      );
-    }
-  };
+        <button onClick={loadData} className="primary-outline-btn" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <RefreshCcw size={16}/> Sync
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+        <div className="data-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '24px' }}>
+           <div style={{ padding: '16px', background: '#e0e7ff', color: '#4f46e5', borderRadius: '16px', display: 'flex' }}><Users size={24} /></div>
+           <div>
+             <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Total Students</p>
+             <h3 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--tp-dark)' }}>{students.length.toString().padStart(2, '0')}</h3>
+           </div>
+        </div>
+        <div className="data-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '24px' }}>
+           <div style={{ padding: '16px', background: '#dbeafe', color: '#2563eb', borderRadius: '16px', display: 'flex' }}><Building size={24} /></div>
+           <div>
+             <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Active Partners</p>
+             <h3 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--tp-dark)' }}>{companies.length.toString().padStart(2, '0')}</h3>
+           </div>
+        </div>
+        <div className="data-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '24px' }}>
+           <div style={{ padding: '16px', background: '#dcfce7', color: '#16a34a', borderRadius: '16px', display: 'flex' }}><Briefcase size={24} /></div>
+           <div>
+             <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Live Training</p>
+             <h3 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--tp-dark)' }}>{trainings.length.toString().padStart(2, '0')}</h3>
+           </div>
+        </div>
+        <div className="data-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '24px' }}>
+           <div style={{ padding: '16px', background: '#fef3c7', color: '#d97706', borderRadius: '16px', display: 'flex' }}><FileText size={24} /></div>
+           <div>
+             <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Syllabus Docs</p>
+             <h3 style={{ fontSize: '28px', fontWeight: '900', color: 'var(--tp-dark)' }}>{pdfs.length.toString().padStart(2, '0')}</h3>
+           </div>
+        </div>
+      </div>
+
+      <div className="data-card table-card-pro">
+        <h3 style={{ padding: '20px 24px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Plus size={18} color="var(--tp-primary)" /> Recent Enrollments
+        </h3>
+        <table className="modern-pro-table">
+          <thead>
+            <tr>
+              <th>Student Details</th>
+              <th>Platform Email</th>
+              <th style={{ textAlign: 'right' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.slice(0, 5).map((s, i) => (
+              <tr key={i}>
+                <td>
+                  <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="cell-logo" style={{ minWidth: '40px', height: '40px', borderRadius: '10px', background: 'var(--tp-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      {s.name[0]}
+                    </div>
+                    <strong>{s.name}</strong>
+                  </div>
+                </td>
+                <td><span className="role-text">{s.email}</span></td>
+                <td style={{ textAlign: 'right' }}><div className="status-pill selected" style={{ display: 'inline-flex' }}>Active</div></td>
+              </tr>
+            ))}
+            {students.length === 0 && (
+              <tr>
+                <td colSpan="3">
+                  <div className="empty-table-msg">
+                    <Users />
+                    <p>No enrollments processed.</p>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderTrainings = () => (
+    <div className="dash-body animate-in">
+      <div className="page-header">
+        <div className="header-info">
+          <h2>Course Management</h2>
+          <p>Deploy standard training modules to students.</p>
+        </div>
+        <button 
+          onClick={() => { setIsModalOpen(true); setCurrentTraining({ title: "", subject: "", description: "", duration: "", startDate: "", price: "", language: "", level: "Beginner" }); }}
+          className="primary-btn-pro" style={{ width: 'auto' }}
+        >
+          <FaPlus /> Launch Module
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+        {trainings.map(t => (
+          <div key={t._id} className="data-card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+               <span style={{ padding: '6px 12px', background: 'var(--tp-surface)', color: 'var(--tp-primary)', borderRadius: '8px', fontSize: '12px', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                 {t.subject}
+               </span>
+               <div style={{ display: 'flex', gap: '8px' }}>
+                 <button onClick={() => { setIsModalOpen(true); setCurrentTraining(t); }} className="primary-outline-btn" style={{ padding: '8px', width: 'auto' }}><Edit size={14} /></button>
+                 <button onClick={() => handleDeleteTraining(t._id)} className="primary-outline-btn" style={{ padding: '8px', width: 'auto', border: '1px solid #fee2e2', color: '#ef4444' }}><Trash size={14} /></button>
+               </div>
+            </div>
+            <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--tp-dark)', marginBottom: '8px' }}>{t.title}</h3>
+            <p style={{ fontSize: '14px', color: 'var(--tp-muted)', marginBottom: '20px', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.description}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--tp-border)' }}>
+               <div style={{ display: 'flex', flexDirection: 'column' }}>
+                 <span style={{ fontSize: '12px', color: 'var(--tp-muted)' }}>Duration</span>
+                 <span style={{ fontWeight: '700', color: 'var(--tp-dark)' }}>{t.duration}</span>
+               </div>
+               <div style={{ fontSize: '20px', fontWeight: '900', color: 'var(--tp-primary)' }}>₹{t.price}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div className="data-card animate-fade" style={{ width: '100%', maxWidth: '700px', padding: '40px' }}>
+             <h2 style={{ fontSize: '26px', fontWeight: '800', color: 'var(--tp-dark)', marginBottom: '24px' }}>{currentTraining._id ? "Update Course" : "Create New Module"}</h2>
+             <form onSubmit={handleSaveTraining} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <input placeholder="Course Title" value={currentTraining.title} onChange={e => setCurrentTraining({...currentTraining, title: e.target.value})} required style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%' }} />
+                <input placeholder="Subject (e.g. Java)" value={currentTraining.subject} onChange={e => setCurrentTraining({...currentTraining, subject: e.target.value})} required style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%' }} />
+                <textarea placeholder="Brief Description" value={currentTraining.description} onChange={e => setCurrentTraining({...currentTraining, description: e.target.value})} style={{ gridColumn: '1 / -1', padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', minHeight: '100px', fontFamily: 'inherit', width: '100%' }} />
+                <input placeholder="Duration (e.g. 6 Weeks)" value={currentTraining.duration} onChange={e => setCurrentTraining({...currentTraining, duration: e.target.value})} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%' }} />
+                <input placeholder="Price (₹)" type="number" value={currentTraining.price} onChange={e => setCurrentTraining({...currentTraining, price: e.target.value})} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%' }} />
+                <input placeholder="Language (e.g. Hindi, English)" value={currentTraining.language || ""} onChange={e => setCurrentTraining({...currentTraining, language: e.target.value})} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%' }} />
+                <select value={currentTraining.level} onChange={e => setCurrentTraining({...currentTraining, level: e.target.value})} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', width: '100%', background: '#fff' }}>
+                   <option>Beginner</option>
+                   <option>Intermediate</option>
+                   <option>Advanced</option>
+                </select>
+                <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '16px' }}>
+                   <button type="button" onClick={() => setIsModalOpen(false)} className="primary-outline-btn" style={{ width: 'auto' }}>Discard</button>
+                   <button type="submit" className="primary-btn-pro" style={{ width: 'auto' }}>Confirm Setup</button>
+                </div>
+             </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSyllabusManager = () => (
+    <div className="dash-body animate-in">
+      <div className="data-card" style={{ marginBottom: '32px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--tp-dark)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Upload color="var(--tp-primary)" /> Upload New Syllabus PDF
+        </h2>
+        <form onSubmit={handleUploadSyllabus} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: '20px', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)' }}>Syllabus Title</label>
+            <input 
+              name="title" 
+              placeholder="e.g. Java Full Stack Syllabus" 
+              required 
+              style={{ padding: '14px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none' }}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)' }}>Select Training</label>
+            <select name="trainingId" style={{ padding: '14px', borderRadius: '12px', border: '1px solid var(--tp-border)', outline: 'none', background: '#fff' }}>
+              <option value="">General Syllabus</option>
+              {trainings.map(t => <option key={t._id} value={t._id}>{t.title}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+             <label style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tp-muted)' }}>PDF File</label>
+             <div style={{ display: 'flex', gap: '12px' }}>
+                <input type="file" name="pdf" accept=".pdf" required style={{ padding: '10px', background: '#fff', border: '1px solid var(--tp-border)', borderRadius: '12px', fontSize: '13px', flex: 1 }} />
+                <button type="submit" disabled={uploading} className="primary-btn-pro" style={{ padding: '14px 24px', width: 'auto' }}>
+                  {uploading ? <Loader2 className="animate-spin" size={18} /> : "Upload"}
+                </button>
+             </div>
+          </div>
+        </form>
+      </div>
+
+      <div className="data-card table-card-pro">
+        <div style={{ padding: '24px', borderBottom: '1px solid var(--tp-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontWeight: '800', color: 'var(--tp-dark)', fontSize: '18px' }}>Manage Syllabus Documents</h3>
+          <FaSearch color="var(--tp-muted)" />
+        </div>
+        <table className="modern-pro-table">
+          <thead>
+            <tr>
+              <th>Document Title</th>
+              <th>Assigned Training</th>
+              <th style={{ textAlign: 'center' }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pdfs.map(pdf => (
+              <tr key={pdf._id}>
+                <td>
+                  <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '700', color: 'var(--tp-dark)' }}>
+                    <div className="cell-logo" style={{ minWidth: '40px', background: '#f8fafc', color: 'var(--tp-primary)' }}><FileText size={18} /></div>
+                    <span className="role-text">{pdf.title}</span>
+                  </div>
+                </td>
+                <td style={{ color: 'var(--tp-muted)', fontWeight: '600' }}>{trainings.find(t => t._id === pdf.trainingId)?.title || "General"}</td>
+                <td style={{ textAlign: 'center' }}>
+                  <button onClick={() => handleDeletePdf(pdf._id)} className="primary-outline-btn" style={{ width: 'auto', padding: '8px 16px', border: '1px solid #fee2e2', color: '#ef4444' }}><Trash size={16} /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="pro-admin-layout">
-      {/* Sidebar V4 - Dark Pro */}
-      <aside className="pro-sidebar">
-         <div className="sidebar-brand">
-            <div className="brand-dot"></div>
-            <span>ADMIN <span>PRO</span></span>
-         </div>
-         
-         <div className="sidebar-section">
-            <span className="section-title">Insights</span>
-            <div className={`pro-sidebar-link ${page === 'dashboard' ? 'active' : ''}`} onClick={() => setPage('dashboard')}>
-               <FaChartPie /> <span>Dashboard</span>
+    <div className="dashboard-container">
+      <Toaster position="top-right" />
+      
+      {/* Sidebar */}
+      <aside className="fixed-sidebar">
+        <div className="sidebar-logo">
+          🎓 <span>Executive</span>
+        </div>
+        
+        <nav className="side-nav">
+          {[
+            { id: "dashboard", icon: <FaChartPie />, label: "Dashboard" },
+            { id: "trainings", icon: <FaBriefcase />, label: "Trainings" },
+            { id: "syllabus", icon: <FileText size={18} />, label: "Syllabus" },
+          ].map(item => (
+            <div 
+              key={item.id} 
+              className={`nav-item ${page === item.id ? "active" : ""}`}
+              onClick={() => setPage(item.id)}
+            >
+              {item.icon} <span>{item.label}</span>
             </div>
-         </div>
+          ))}
+        </nav>
 
-         <div className="sidebar-section">
-            <span className="section-title">Management</span>
-            <div className={`pro-sidebar-link ${page === 'students' ? 'active' : ''}`} onClick={() => setPage('students')}>
-               <FaUserGraduate /> <span>Students</span>
-            </div>
-            <div className={`pro-sidebar-link ${page === 'companies' ? 'active' : ''}`} onClick={() => setPage('companies')}>
-               <FaBuilding /> <span>Companies</span>
-            </div>
-            <div className={`pro-sidebar-link ${page === 'jobs' ? 'active' : ''}`} onClick={() => setPage('jobs')}>
-               <FaBriefcase /> <span>Job Postings</span>
-            </div>
-            <div className={`pro-sidebar-link ${page === 'drives' ? 'active' : ''}`} onClick={() => setPage('drives')}>
-               <FaFileLines /> <span>Drive Cycles</span>
-            </div>
-         </div>
-
-         <div className="sidebar-section">
-            <span className="section-title">Preferences</span>
-            <div className={`pro-sidebar-link ${page === 'settings' ? 'active' : ''}`} onClick={() => setPage('settings')}>
-               <FaGear /> <span>Infrastructure</span>
-            </div>
-         </div>
-
-         <div className="sidebar-footer">
-            <button className="pro-logout" onClick={handleLogout}>
-               <FaRightFromBracket /> <span>Exit Terminal</span>
-            </button>
-         </div>
+        <div className="sidebar-bottom">
+          <button onClick={() => navigate("/")} className="logout-btn">
+            <FaSignOutAlt /> <span>Sign Out Gateway</span>
+          </button>
+        </div>
       </aside>
 
-      <main className="pro-main">
-         <header className="pro-header">
-            <div className="pro-header-left">
-               <span className="pro-breadcrumb">Portal / Management / <span>{page}</span></span>
+      {/* Main Container */}
+      <main className="main-content-area">
+        <header className="top-navbar">
+          <div className="search-bar">
+            <FaSearch />
+            <input type="text" placeholder="Search parameters..." />
+          </div>
+          <div className="profile-actions">
+            <div className="nav-profile clickable-profile">
+              <span>Admin TP Master</span>
+              <div className="p-avatar">AD</div>
             </div>
-            <div className="pro-header-right">
-               <div className="pro-notif"><FaBell /> <div className="notif-dot"></div></div>
-               <div className="pro-divider-v"></div>
-               <div className="pro-user-chip">
-                  <div className="avatar">AD</div>
-                  <div className="details">
-                     <span className="name">Super Admin</span>
-                     <span className="role">Platform Master</span>
-                  </div>
-               </div>
-            </div>
-         </header>
+          </div>
+        </header>
 
-         <div className="pro-container">
-            {loading ? (
-               <div className="pro-loading">
-                  <div className="pro-spinner"></div>
-                  <p>Initializing secure protocol...</p>
-               </div>
-            ) : renderContent()}
-         </div>
+        <section className="scroll-content">
+          {loading ? (
+            <div className="loader-container">
+               <div className="loader-spin"></div>
+               <p>Synchronizing Executive Data...</p>
+            </div>
+          ) : (
+            <>
+              {page === "dashboard" && renderDashboard()}
+              {page === "trainings" && renderTrainings()}
+              {page === "syllabus" && renderSyllabusManager()}
+            </>
+          )}
+        </section>
       </main>
-
-      {/* Corporate Analytics Modal */}
-      {showAnalyticsModal && selectedCompany && (
-         <div className="pro-overlay" onClick={() => setShowAnalyticsModal(false)}>
-            <div className="pro-modal pro-modal-lg" onClick={e => e.stopPropagation()}>
-               <div className="modal-header-v4">
-                  <div className="header-info">
-                     <h3>{selectedCompany.name} Analytics</h3>
-                     <p>Recruitment performance overview</p>
-                  </div>
-                  <button className="close-btn" onClick={() => setShowAnalyticsModal(false)}><FaXmark /></button>
-               </div>
-               <div className="modal-body-v4">
-                  <div className="pro-modal-stats">
-                     <div className="stat-unit">
-                        <span>Avg Package</span>
-                        <strong>14.2 LPA</strong>
-                     </div>
-                     <div className="stat-unit">
-                        <span>Offers Made</span>
-                        <strong>24</strong>
-                     </div>
-                     <div className="stat-unit">
-                        <span>Success Rate</span>
-                        <strong>18.4%</strong>
-                     </div>
-                  </div>
-                  <div className="modal-chart-v4">
-                     <Bar 
-                        data={{
-                           labels: ['2020', '2021', '2022', '2023', '2024'],
-                           datasets: [{
-                              label: 'Placements',
-                              data: [12, 19, 15, 25, 30],
-                              backgroundColor: '#2563eb',
-                              borderRadius: 4
-                           }]
-                        }} 
-                        options={{ maintainAspectRatio: false }}
-                     />
-                  </div>
-               </div>
-            </div>
-         </div>
-      )}
-
-      {/* Add/Edit Modal */}
-      {showAddModal && (
-         <div className="pro-overlay" onClick={() => setShowAddModal(false)}>
-            <div className="pro-modal" onClick={e => e.stopPropagation()}>
-               <div className="modal-header-v4">
-                  <h3>{isEditMode ? 'Modify' : 'Register'} {modalType}</h3>
-                  <button className="close-btn" onClick={() => setShowAddModal(false)}><FaXmark /></button>
-               </div>
-               <form className="modal-form-v4" onSubmit={handleSubmit}>
-                  <div className="form-group-v4">
-                     <label>Full Name / Identifier</label>
-                     <input type="text" value={formData.name || ""} required onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                  </div>
-                  <div className="form-group-v4">
-                     <label>Official Email</label>
-                     <input type="email" value={formData.email || ""} required onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                  </div>
-                  <div className="modal-actions-v4">
-                     <button type="button" className="pro-btn-subtle" onClick={() => setShowAddModal(false)}>Discard</button>
-                     <button type="submit" className="pro-btn-primary">{isEditMode ? 'Update Record' : 'Commit Entry'}</button>
-                  </div>
-               </form>
-            </div>
-         </div>
-      )}
     </div>
   );
 }

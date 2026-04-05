@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaGraduationCap } from "react-icons/fa";
+import { FaGraduationCap, FaBell, FaChevronDown } from "react-icons/fa";
 import "../style/GlobalComponents.css";
 
 const Navbar = () => {
@@ -27,8 +27,11 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Role
+  // User Info
   const userRole = localStorage.getItem("userRole");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const userName = userInfo?.name || "Verified User";
+  const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
 
   // Dashboard route
   const getDashboardPath = () => {
@@ -73,24 +76,34 @@ const Navbar = () => {
           <Link to="/mock-interview" className={isActive("/mock-interview")}>Mock Interview</Link>
           <Link to="/contact" className={isActive("/contact")}>Contact</Link>
 
-          {/* AUTH */}
-          <div className="auth-section">
             {userRole ? (
-              <>
-                <Link to={getDashboardPath()} className="btn dashboard-btn">
-                  Dashboard
+              <div className="user-nav-section">
+                <div className="notif-box">
+                  <FaBell />
+                  <span className="notif-dot"></span>
+                </div>
+
+                <Link to={getDashboardPath()} className="user-badge">
+                  <span className="user-name-label">{userName}</span>
+                  <div className="avatar-init">{userInitials}</div>
                 </Link>
 
-                <button onClick={handleLogout} className="btn logout-btn">
+                <button onClick={handleLogout} className="btn logout-btn" style={{marginLeft: '10px'}}>
                   Logout
                 </button>
-              </>
+              </div>
             ) : (
-              <Link to="/login" className="btn login-btn">
-                Login
-              </Link>
+              <div className="login-dropdown-wrapper">
+                <Link to="/login" className="btn nav-login-btn">
+                  Login <FaChevronDown style={{ fontSize: "12px", marginLeft: "4px" }} />
+                </Link>
+                <div className="login-dropdown-menu">
+                  <Link to="/login?role=student" target="_blank">Student Login</Link>
+                  <Link to="/login?role=company" target="_blank">TPO / Corporate</Link>
+                  <Link to="/login?role=admin" target="_blank">Admin Login</Link>
+                </div>
+              </div>
             )}
-          </div>
         </nav>
 
       </div>

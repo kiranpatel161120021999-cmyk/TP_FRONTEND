@@ -28,10 +28,40 @@ const Home = () => {
             <p className="hero-subtitle">
               The ultimate Training & Placement portal. Build industry-grade skills, prepare with AI, and land your first job — all in one unified platform.
             </p>
-            <div className="hero-actions centered-actions">
-              <Link to="/signup" className="btn-hero-primary">Get Started for Free</Link>
-              <Link to="/alljobs" className="btn-hero-outline">Explore Live Jobs</Link>
-            </div>
+
+            {(() => {
+              const userRole = localStorage.getItem("userRole");
+              const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+              const userName = userInfo?.name || "Student";
+              const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+              const dashboardPath = userRole === "admin" ? "/admindashboard" : userRole === "company" ? "/company-dashboard" : "/studentdashboard";
+
+              if (userRole) {
+                return (
+                  <div className="logged-in-hero-view">
+                    <div className="user-profile-card-mini">
+                       <div className="avatar-mini">{userInitials}</div>
+                       <div className="info-mini">
+                          <h3>Welcome back, {userName}! 👋</h3>
+                          <p>{userInfo?.course || userRole}</p>
+                       </div>
+                    </div>
+                    <div className="hero-actions centered-actions">
+                      <Link to={dashboardPath} className="btn-hero-primary">Go to Dashboard</Link>
+                      <Link to="/profile" className="btn-hero-outline">View My Profile</Link>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="hero-actions centered-actions">
+                  <Link to="/signup" className="btn-hero-primary">Get Started for Free</Link>
+                  <Link to="/alljobs" className="btn-hero-outline">Explore Live Jobs</Link>
+                </div>
+              );
+            })()}
+
             <div className="hero-badges centered-badges">
               <span>Free Registration</span>
               <span>Real Job Listings</span>

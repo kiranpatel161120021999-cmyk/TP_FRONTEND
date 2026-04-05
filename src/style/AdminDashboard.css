@@ -10,7 +10,7 @@
   --a-h: 199; --a-s: 89%; --a-l: 48%; /* Accent Cyan */
   --admin-accent: hsl(var(--a-h), var(--a-s), var(--a-l));
   
-  --admin-navy: #0f172a;
+  --admin-navy: #2e1065;
   --admin-bg: #f8fafc;
   --admin-card-bg: rgba(255, 255, 255, 0.9);
   --admin-border: rgba(109, 40, 217, 0.1);

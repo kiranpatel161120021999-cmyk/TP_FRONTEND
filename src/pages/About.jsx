@@ -10,9 +10,9 @@ const AboutUs = () => {
 
       <Header />
 
-      {/* ── HERO ── */}
+      {/* ── ELITE MESH HERO ── */}
       <section className="ab-hero">
-        <div className="ab-container ab-hero-inner">
+        <div className="ab-container ab-hero-inner reveal-in">
           <span className="ab-badge">🏫 Who We Are</span>
           <h1>Empowering Students to<br /><span>Achieve Excellence</span></h1>
           <p>
@@ -25,20 +25,18 @@ const AboutUs = () => {
             <Link to="/contact" className="ab-btn-outline">Contact Us →</Link>
           </div>
         </div>
-        <div className="ab-hero-wave">
-          <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f9fafb"/>
-          </svg>
-        </div>
       </section>
 
       {/* ── STATS STRIP ── */}
       <section className="ab-stats-wrap">
         <div className="ab-container">
-          <div className="ab-stats">
+          <div className="ab-stats reveal-in">
             <div className="ab-stat"><h3>500+</h3><p>Students Placed</p></div>
+            <div className="ab-stat-separator"></div>
             <div className="ab-stat"><h3>120+</h3><p>Hiring Partners</p></div>
+            <div className="ab-stat-separator"></div>
             <div className="ab-stat"><h3>12+</h3><p>Years of Excellence</p></div>
+            <div className="ab-stat-separator"></div>
             <div className="ab-stat"><h3>98%</h3><p>Success Rate</p></div>
           </div>
         </div>
@@ -47,33 +45,35 @@ const AboutUs = () => {
       {/* ── MISSION & VISION ── */}
       <section className="ab-section ab-mv-section">
         <div className="ab-container">
-          <div className="ab-sec-header">
+          <div className="ab-sec-header reveal-in">
             <span className="ab-sec-badge">Our Foundation</span>
             <h2>Mission &amp; Vision</h2>
+            <p>Driving continuous innovation in student placement and training methodologies.</p>
           </div>
           <div className="ab-mv-grid">
-            <div className="ab-mv-card">
+            <div className="ab-mv-card reveal-in reveal-d1">
               <div className="ab-mv-icon" style={{background:'#f5f3ff', color:'#6d28d9'}}>
                 <i className="fa-solid fa-bullseye"></i>
               </div>
               <h3>Our Mission</h3>
               <p>To provide 100% placement assistance and groom students into globally competent professionals through structured training, mentorship, and industry exposure.</p>
               <ul className="ab-check-list">
-                <li>✅ Structured training programs</li>
-                <li>✅ Industry-relevant curriculum</li>
-                <li>✅ Dedicated placement support</li>
+                <li><span>✓</span> Structured training programs</li>
+                <li><span>✓</span> Industry-relevant curriculum</li>
+                <li><span>✓</span> Dedicated placement support</li>
               </ul>
             </div>
-            <div className="ab-mv-card ab-mv-card--accent">
-              <div className="ab-mv-icon" style={{background:'rgba(255,255,255,0.2)', color:'white'}}>
+            
+            <div className="ab-mv-card ab-mv-card--accent reveal-in reveal-d2">
+              <div className="ab-mv-icon" style={{background:'rgba(255,255,255,0.15)', color:'white'}}>
                 <i className="fa-regular fa-eye"></i>
               </div>
               <h3>Our Vision</h3>
               <p>To be a center of excellence in training and placement, fostering strong industry linkages that transform students into confident, capable, and career-ready professionals.</p>
               <ul className="ab-check-list ab-check-list--white">
-                <li>✅ Industry-academia partnerships</li>
-                <li>✅ Global career readiness</li>
-                <li>✅ Lifelong alumni network</li>
+                <li><span>✓</span> Industry-academia partnerships</li>
+                <li><span>✓</span> Global career readiness</li>
+                <li><span>✓</span> Lifelong alumni network</li>
               </ul>
             </div>
           </div>
@@ -83,7 +83,7 @@ const AboutUs = () => {
       {/* ── QUOTE BANNER ── */}
       <section className="ab-quote-banner">
         <div className="ab-container">
-          <div className="ab-quote-inner">
+          <div className="ab-quote-inner reveal-in">
             <span className="ab-quote-mark">"</span>
             <h2>Quality is not an act, it is a habit.</h2>
             <p>We strive for quality in every aspect of our training &amp; placement process.</p>
@@ -95,54 +95,28 @@ const AboutUs = () => {
       {/* ── WHAT WE DO ── */}
       <section className="ab-section ab-values-section">
         <div className="ab-container">
-          <div className="ab-sec-header">
+          <div className="ab-sec-header reveal-in">
             <span className="ab-sec-badge">Our Focus</span>
             <h2>What We Do</h2>
-            <p>Core pillars that drive student success at every stage.</p>
+            <p>Core pillars that drive student success at every stage of their academic journey.</p>
           </div>
           <div className="ab-val-grid">
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#f5f3ff', color:'#6d28d9'}}>
-                <i className="fa-solid fa-laptop-code"></i>
+            {[
+              { icon: 'fa-laptop-code', title: 'Skill Development', desc: 'Technical workshops, coding bootcamps, and soft skill sessions tailored to industry needs.', color: 'purple' },
+              { icon: 'fa-handshake', title: 'Campus Recruitment', desc: 'Hosting top MNCs and startups for exclusive on-campus hiring drives every semester.', color: 'blue' },
+              { icon: 'fa-network-wired', title: 'Industry Connect', desc: 'Seminars, guest lectures, and industrial visits to give students real-world exposure.', color: 'emerald' },
+              { icon: 'fa-robot', title: 'AI-Powered Tools', desc: 'Resume Intelligence and Mock Interview tools to sharpen your competitive edge.', color: 'amber' },
+              { icon: 'fa-certificate', title: 'Certifications', desc: 'Earn verified training certificates recognized by leading industry partners.', color: 'rose' },
+              { icon: 'fa-users', title: 'Alumni Network', desc: 'Stay connected with 500+ alumni placed across top companies worldwide.', color: 'purple' }
+            ].map((v, i) => (
+              <div className="ab-val-card reveal-in" key={i} style={{animationDelay: `${i * 0.1}s`}}>
+                <div className={`ab-val-icon bg-${v.color}`}>
+                  <i className={`fa-solid ${v.icon}`}></i>
+                </div>
+                <h3>{v.title}</h3>
+                <p>{v.desc}</p>
               </div>
-              <h3>Skill Development</h3>
-              <p>Technical workshops, coding bootcamps, and soft skill sessions tailored to industry needs.</p>
-            </div>
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#e0f2fe', color:'#0284c7'}}>
-                <i className="fa-solid fa-handshake"></i>
-              </div>
-              <h3>Campus Recruitment</h3>
-              <p>Hosting top MNCs and startups for exclusive on-campus hiring drives every semester.</p>
-            </div>
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#d1fae5', color:'#059669'}}>
-                <i className="fa-solid fa-network-wired"></i>
-              </div>
-              <h3>Industry Connect</h3>
-              <p>Seminars, guest lectures, and industrial visits to give students real-world exposure.</p>
-            </div>
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#fef3c7', color:'#d97706'}}>
-                <i className="fa-solid fa-robot"></i>
-              </div>
-              <h3>AI-Powered Tools</h3>
-              <p>Resume Intelligence and Mock Interview tools to sharpen your competitive edge.</p>
-            </div>
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#fee2e2', color:'#dc2626'}}>
-                <i className="fa-solid fa-certificate"></i>
-              </div>
-              <h3>Certifications</h3>
-              <p>Earn verified training certificates recognized by leading industry partners.</p>
-            </div>
-            <div className="ab-val-card">
-              <div className="ab-val-icon" style={{background:'#ede9fe', color:'#7c3aed'}}>
-                <i className="fa-solid fa-users"></i>
-              </div>
-              <h3>Alumni Network</h3>
-              <p>Stay connected with 500+ alumni placed across top companies worldwide.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -150,11 +124,11 @@ const AboutUs = () => {
       {/* ── PRINCIPAL MESSAGE ── */}
       <section className="ab-section ab-principal-section">
         <div className="ab-container">
-          <div className="ab-sec-header">
+          <div className="ab-sec-header reveal-in">
             <span className="ab-sec-badge">Leadership</span>
             <h2>Message from the Director</h2>
           </div>
-          <div className="ab-principal-card">
+          <div className="ab-principal-card reveal-in">
             <img
               src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400"
               alt="Principal"
@@ -177,7 +151,7 @@ const AboutUs = () => {
       {/* ── TEAM ── */}
       <section className="ab-section ab-team-section" id="team">
         <div className="ab-container">
-          <div className="ab-sec-header">
+          <div className="ab-sec-header reveal-in">
             <span className="ab-sec-badge">The People</span>
             <h2>Meet Our Team</h2>
             <p>The passionate people behind every placement success story.</p>
@@ -189,7 +163,7 @@ const AboutUs = () => {
               { name:'Ms. Priya Kapoor', role:'Coordinator',        img:'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400' },
               { name:'Mr. Vikram Malhotra', role:'Industry Relations', img:'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400' },
             ].map((m, i) => (
-              <div className="ab-team-card" key={i}>
+              <div className="ab-team-card reveal-in" key={i} style={{animationDelay: `${i * 0.1}s`}}>
                 <div className="ab-team-img-wrap">
                   <img src={m.img} alt={m.name} />
                 </div>
