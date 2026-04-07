@@ -28,6 +28,7 @@ import MockInterview from "./pages/MockInterview";
 import CompanyDashboard from "./pages/CompanyDashboard";
 import Success from "./pages/Success";
 import Certificate from "./pages/Certificate";
+import AIChatWidget from "./components/AIChatWidget";
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -46,7 +47,8 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 
 function App() {
   return (
-    <Routes>
+    <>
+      <Routes>
 
       {/* HOME */}
       <Route path="/" element={<Home />} />
@@ -123,7 +125,9 @@ function App() {
       {/* AUTH */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-    </Routes>
+      </Routes>
+      <AIChatWidget />
+    </>
   );
 }
 

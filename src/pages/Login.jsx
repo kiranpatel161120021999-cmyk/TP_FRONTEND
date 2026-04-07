@@ -53,13 +53,17 @@ const Login = () => {
         showPopup("Success ✅", "Google login successful! Redirecting...", "success", finalPath);
       }
     } catch (error) {
-      showPopup("Auth Failed", error?.response?.data?.message || "Google login failed.", "error");
+      if (error?.response?.data?.message) {
+        showPopup("Auth Failed", error.response.data.message, "error");
+      } else {
+        showPopup("Auth Failed", "Google authentication failed. Please ensure your Google Console 'Origins' are set to http://localhost:5173.", "error");
+      }
     } finally {
       setLoading(false);
     }
   };
   const handleGoogleError = () => {
-    showPopup("Auth Error", "Google Login could not be initialized.", "error");
+    showPopup("Auth Error", "Google Login could not be initialized. Please check your Authorized JavaScript Origins in Google Console.", "error");
   };
 
   // STEP 1 -> 2 (Send OTP)
