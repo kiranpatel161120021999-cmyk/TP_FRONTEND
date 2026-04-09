@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaCheckCircle, FaBookOpen, FaChartLine, FaHome } from "react-icons/fa";
@@ -15,7 +15,7 @@ const Success = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/trainings/${id}`);
+        const res = await axios.get(`/api/trainings/${id}`);
         setCourse(res.data);
       } catch (err) {
         console.error("Fetch Error:", err);

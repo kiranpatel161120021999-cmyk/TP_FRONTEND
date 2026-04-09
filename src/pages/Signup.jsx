@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUser, FaLock, FaEnvelope, FaCheck, FaTimes, FaArrowRight, FaGraduationCap, FaBook, FaCalendarAlt, FaKey, FaRocket } from "react-icons/fa";
@@ -46,7 +46,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/send-otp", { 
+      const response = await axios.post("/api/auth/send-otp", { 
         email: formData.email.trim() 
       });
       showPopup("Verify Email 📧", response.data.message || "Enter the 6-digit code sent to your academic inbox.", "success");
@@ -64,7 +64,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      const response = await axios.post("/api/auth/verify-otp", {
         otp: otp.trim(),
         ...formData
       });
@@ -84,7 +84,7 @@ const Signup = () => {
   // GOOGLE SIGNUP SUCCESS
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/google-login", {
+      const response = await axios.post("/api/auth/google-login", {
         credential: credentialResponse.credential,
       });
 

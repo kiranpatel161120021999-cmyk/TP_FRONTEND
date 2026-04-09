@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { FaRobot, FaPaperPlane, FaTimes, FaCircle, FaGraduationCap, FaBriefcase, FaIdCard } from "react-icons/fa";
@@ -52,7 +52,7 @@ const AIChatWidget = () => {
       const userRole = localStorage.getItem("userRole");
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      const response = await axios.post("http://localhost:5000/api/ai/chat", {
+      const response = await axios.post("/api/ai/chat", {
         message: userMsg.text,
         history: chatHistory,
         userRole,

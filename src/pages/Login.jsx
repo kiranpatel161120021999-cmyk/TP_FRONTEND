@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { FaEnvelope, FaLock, FaCheck, FaTimes, FaRocket, FaShieldAlt, FaKey } from "react-icons/fa";
@@ -28,7 +28,7 @@ const Login = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/google-login", {
+      const response = await axios.post("/api/auth/google-login", {
         credential: credentialResponse.credential,
       });
 
@@ -78,7 +78,7 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/send-otp", { email: email.trim() });
+      const response = await axios.post("/api/auth/send-otp", { email: email.trim() });
       showPopup("Notice 📧", response.data.message || "A verification code has been generated. Check your console/inbox.", "success");
       setAuthStep(2);
     } catch (error) {
@@ -94,7 +94,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      const response = await axios.post("/api/auth/verify-otp", {
         email: email.trim(),
         password: password.trim(),
         otp: otp.trim()

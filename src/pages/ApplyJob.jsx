@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -122,7 +122,7 @@ function ApplyJob() {
 
       // ✅ FIX: removed unused res + added headers
       await axios.post(
-        "http://localhost:5000/api/applications/applyjob",
+        "/api/applications/applyjob",
         data,
         {
           headers: {

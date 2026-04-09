@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
@@ -8,7 +8,7 @@ import '../style/Home.css';
 const Home = () => {
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/test")
+    axios.get("/api/test")
       .then(res => console.log("Backend attached:", res.data))
       .catch(err => console.log(err));
   }, []);

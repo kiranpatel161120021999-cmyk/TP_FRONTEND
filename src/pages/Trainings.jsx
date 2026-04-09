@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FaLaptopCode, FaClock, FaSearch, FaCode, FaServer, FaPaintBrush, FaGraduationCap, FaArrowRight } from 'react-icons/fa';
@@ -28,7 +28,7 @@ const Trainings = () => {
   useEffect(() => {
     const fetchTrainings = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/trainings");
+        const res = await axios.get("/api/trainings");
         setTrainings(res.data);
       } catch (err) {
         console.error("Error fetching trainings:", err);

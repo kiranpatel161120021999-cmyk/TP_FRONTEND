@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FileText, Download, Loader2, AlertCircle } from "lucide-react";
 
@@ -14,7 +14,7 @@ const Syllabus = ({ trainingId }) => {
   useEffect(() => {
     const fetchPdfs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/syllabus");
+        const res = await axios.get("/api/syllabus");
         // If trainingId is provided, filter by it. Otherwise show all.
         const filtered = trainingId 
           ? res.data.filter(p => p.trainingId === trainingId) 
@@ -78,7 +78,7 @@ const Syllabus = ({ trainingId }) => {
           </div>
           
           <a 
-            href={`http://localhost:5000${pdf.fileUrl}`} 
+            href={`${pdf.fileUrl}`} 
             download 
             className="flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200"
           >

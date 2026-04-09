@@ -1,8 +1,14 @@
-import React from "react";
+﻿import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import axios from "axios";
 import App from "./App";
+
+// ─── Global API Base URL ───────────────────────────────────────────────────────
+// Set VITE_API_BASE_URL in .env (local) or in Vercel dashboard (production).
+// Every axios call in the app will automatically use this base URL.
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || "";
 
 const GOOGLE_CLIENT_ID = "745427042826-5458kcp93m7s7ad90v8rkl2gtuj5sslk.apps.googleusercontent.com";
 

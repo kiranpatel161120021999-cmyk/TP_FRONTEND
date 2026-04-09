@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
@@ -105,12 +105,12 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const [stud, comp, train, pdfRes, jobRes, appRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/students").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/companies").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/trainings").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/syllabus").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/jobs").catch(() => ({ data: [] })),
-        axios.get("http://localhost:5000/api/applications").catch(() => ({ data: [] }))
+        axios.get("/api/students").catch(() => ({ data: [] })),
+        axios.get("/api/companies").catch(() => ({ data: [] })),
+        axios.get("/api/trainings").catch(() => ({ data: [] })),
+        axios.get("/api/syllabus").catch(() => ({ data: [] })),
+        axios.get("/api/jobs").catch(() => ({ data: [] })),
+        axios.get("/api/applications").catch(() => ({ data: [] }))
       ]);
       setStudents(stud.data || []);
       setCompanies(comp.data || []);
@@ -136,7 +136,7 @@ function AdminDashboard() {
     const loadingToast = toast.loading("Saving training...");
     try {
       const payload = { ...currentTraining, price: Number(currentTraining.price) };
-      const res = await axios.post("http://localhost:5000/api/trainings/save", payload);
+      const res = await axios.post("/api/trainings/save", payload);
       if (currentTraining._id) {
         setTrainings(trainings.map(t => t._id === res.data._id ? res.data : t));
         toast.success("Training updated!", { id: loadingToast });
@@ -167,10 +167,10 @@ function AdminDashboard() {
         }
       });
       if (currentJob._id) {
-         await axios.put(`http://localhost:5000/api/jobs/${currentJob._id}`, formData);
+         await axios.put(`/api/jobs/${currentJob._id}`, formData);
          toast.success("Job Updated Successfully!", { id: loadingToast });
       } else {
-         await axios.post("http://localhost:5000/api/jobs/add", formData);
+         await axios.post("/api/jobs/add", formData);
          toast.success("Job Deployed Successfully!", { id: loadingToast });
       }
       setCurrentJob({ title: "", skills: "", companyId: "", location: "", jobType: "Contractor Job", postedDate: "", description: "", image: "", salary: "", eligibility: "" });
@@ -185,7 +185,7 @@ function AdminDashboard() {
     if (!window.confirm("Are you sure you want to delete this job listing? This cannot be undone.")) return;
     const loadingToast = toast.loading("Deleting job...");
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${id}`);
+      await axios.delete(`/api/jobs/${id}`);
       toast.success("✅ Job deleted successfully!", { id: loadingToast, duration: 3000 });
       setJobs(prev => prev.filter(j => j._id !== id));
     } catch (err) {
@@ -206,7 +206,7 @@ function AdminDashboard() {
         formData.append('companyId', cid);
       }
       if (job.newImage) formData.append('image', job.newImage);
-      const res = await axios.put(`http://localhost:5000/api/jobs/${job._id}`, formData);
+      const res = await axios.put(`/api/jobs/${job._id}`, formData);
       toast.success("Job Updated Successfully!", { id: loadingToast });
       const updatedJob = res.data.job;
       // We need to keep the populated companyId if the backend only returns an ID, or merge it.
@@ -231,7 +231,7 @@ function AdminDashboard() {
         if (currentUser[key] !== null) formData.append(key, currentUser[key]);
       });
 
-      await axios.post("http://localhost:5000/api/students", formData, {
+      await axios.post("/api/students", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       
@@ -247,7 +247,7 @@ function AdminDashboard() {
   const handleDeletePdf = async (id) => {
     if (!window.confirm("Delete this syllabus?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/syllabus/${id}`);
+      await axios.delete(`/api/syllabus/${id}`);
       setPdfs(pdfs.filter(p => p._id !== id));
       toast.success("Syllabus removed");
     } catch {

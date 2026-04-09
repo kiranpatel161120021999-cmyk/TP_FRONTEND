@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaUser, FaEnvelope, FaGraduationCap, FaCalendarAlt, FaChartLine, FaCheckCircle, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ function Profile() {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         const email = userInfo?.email;
         if (email) {
-          const res = await axios.get(`http://localhost:5000/api/students/profile/${email}`);
+          const res = await axios.get(`/api/students/profile/${email}`);
           setUser(res.data);
         }
       } catch (err) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaAward, FaGraduationCap, FaDownload, FaPrint, FaArrowLeft } from "react-icons/fa";
@@ -14,7 +14,7 @@ const Certificate = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/trainings/${id}`);
+        const res = await axios.get(`/api/trainings/${id}`);
         setCourse(res.data);
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         if (userInfo.name) setUserName(userInfo.name);

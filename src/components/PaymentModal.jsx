@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { FaTimes, FaCreditCard, FaMobileAlt, FaBuilding, FaCheckCircle, FaLock } from "react-icons/fa";
@@ -45,7 +45,7 @@ const PaymentModal = ({ isOpen, onClose, training, onSuccess }) => {
 
       toast.loading("Connecting to Admission Server...", { id: loadToast });
 
-      const res = await axios.post("http://localhost:5000/api/trainings/enroll", {
+      const res = await axios.post("/api/trainings/enroll", {
         studentId,
         trainingId,
         amount: total

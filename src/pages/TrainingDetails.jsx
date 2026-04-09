@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   FaLaptopCode,
@@ -38,11 +38,11 @@ const TrainingDetails = () => {
     setLoading(true);
     try {
       const studentId = localStorage.getItem("userId");
-      const res = await axios.get(`http://localhost:5000/api/trainings/${id}`);
+      const res = await axios.get(`/api/trainings/${id}`);
       setCourse(res.data);
 
       if (studentId) {
-        const enrollRes = await axios.get(`http://localhost:5000/api/trainings/my-enrollments/${studentId}`);
+        const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
         const enrolled = enrollRes.data.some(e => e._id === id);
         setIsEnrolled(enrolled);
       }
@@ -194,7 +194,7 @@ const TrainingDetails = () => {
                             <span className="lesson-info"><FaBookOpen /> {item.lessons || 4} Interactive Lessons</span>
                             {isEnrolled ? (
                               <div className="syll-buttons">
-                                <a href="http://localhost:5000/uploads/1773130692016-resume.pdf" download={`${course.subject}_Notes_Week_${item.week}.pdf`} 
+                                <a href="/uploads/1773130692016-resume.pdf" download={`${course.subject}_Notes_Week_${item.week}.pdf`} 
                                    className="btn-syll-sm" onClick={(e) => e.stopPropagation()}>
                                     <FaDownload /> Download Study Guide
                                 </a>
@@ -307,7 +307,7 @@ const TrainingDetails = () => {
                       <Link to={`/training-assignment/${course._id}`} className="td-primary-btn full-width">
                         Continue to Module <FaExternalLinkAlt />
                       </Link>
-                      <a href="http://localhost:5000/uploads/1773130692016-resume.pdf" download={`${course.subject}_Complete_Study_Guide.pdf`}
+                      <a href="/uploads/1773130692016-resume.pdf" download={`${course.subject}_Complete_Study_Guide.pdf`}
                         style={{ marginTop: '10px', display: 'block', textAlign: 'center', textDecoration: 'none', color: '#6d28d9', fontWeight: 'bold', fontSize: '14px' }}>
                         <FaDownload /> Download Study Guide PDF
                       </a>

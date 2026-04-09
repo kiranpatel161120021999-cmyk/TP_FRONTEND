@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { FaClock, FaLaptopCode, FaCheckCircle, FaPlayCircle, FaFileAlt, FaCertificate, FaDownload, FaCode, FaLock, FaGraduationCap } from "react-icons/fa";
@@ -23,12 +23,12 @@ const Details = () => {
       const studentId = localStorage.getItem("userId");
       
       // 1. Fetch Training Details
-      const courseRes = await axios.get(`http://localhost:5000/api/trainings/${id}`);
+      const courseRes = await axios.get(`/api/trainings/${id}`);
       setCourse(courseRes.data);
 
       // 2. Check Enrollment if student is logged in
       if (studentId) {
-        const enrollRes = await axios.get(`http://localhost:5000/api/trainings/my-enrollments/${studentId}`);
+        const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
         const enrolled = enrollRes.data.some(e => e._id === id);
         setIsEnrolled(enrolled);
       }
@@ -121,7 +121,7 @@ const Details = () => {
                 <div className="video-wrapper">
                   {course.videoUrl ? (
                     <video controls width="100%">
-                      <source src={`http://localhost:5000${course.videoUrl}`} type="video/mp4" />
+                      <source src={`${course.videoUrl}`} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   ) : (
@@ -189,7 +189,7 @@ const Details = () => {
                             <div className="card-footer">
                               <span className="lesson-info"><FaFileAlt /> {item.lessons || 4} Lessons</span>
                               <div className="syll-buttons">
-                                <a href={`http://localhost:5000/uploads/1773130692016-resume.pdf`} download={`${course.subject}_Notes_Week_${item.week}.pdf`} className="btn-syll-sm" onClick={(e) => e.stopPropagation()}>
+                                <a href={`/uploads/1773130692016-resume.pdf`} download={`${course.subject}_Notes_Week_${item.week}.pdf`} className="btn-syll-sm" onClick={(e) => e.stopPropagation()}>
                                     <FaDownload /> Download Study Guide
                                 </a>
                                 <button className="btn-syll-sm outline" onClick={(e) => { e.stopPropagation(); window.open(getUsefulLink(course.subject), "_blank"); }}>
@@ -246,7 +246,7 @@ const Details = () => {
                     <button className="btn-enroll-primary success" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
                       Resume Module
                     </button>
-                    <a href="http://localhost:5000/uploads/1773130692016-resume.pdf" download="Essential_Course_Guide.pdf" className="btn-enroll-outline" style={{marginTop: '10px', display: 'block', textAlign: 'center', textDecoration: 'none', background: '#f5f3ff', color: '#6d28d9', padding: '10px', borderRadius: '8px', fontWeight: 'bold'}}>
+                    <a href="/uploads/1773130692016-resume.pdf" download="Essential_Course_Guide.pdf" className="btn-enroll-outline" style={{marginTop: '10px', display: 'block', textAlign: 'center', textDecoration: 'none', background: '#f5f3ff', color: '#6d28d9', padding: '10px', borderRadius: '8px', fontWeight: 'bold'}}>
                       <FaDownload /> Essential Guide PDF
                     </a>
                   </div>

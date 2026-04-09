@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -44,21 +44,21 @@ const StudentDashboard = () => {
       const email = userInfo?.email;
 
       if (email) {
-        const res = await axios.get(`http://localhost:5000/api/students/profile/${email}`);
+        const res = await axios.get(`/api/students/profile/${email}`);
         setUser(res.data);
       } else {
         // Just for demo
         setUser({ name: "Demo Student", email: "student@sample.com", course: "B.Tech CSE" });
       }
 
-      const compRes = await axios.get("http://localhost:5000/api/companies");
+      const compRes = await axios.get("/api/companies");
       setCompanies(compRes.data);
 
-      const jobRes = await axios.get("http://localhost:5000/api/jobs");
+      const jobRes = await axios.get("/api/jobs");
       setJobs(jobRes.data);
 
       if (email) {
-        const appRes = await axios.get(`http://localhost:5000/api/applications/user/${email}`);
+        const appRes = await axios.get(`/api/applications/user/${email}`);
         
         if (appRes.data && appRes.data.length > 0) {
           setApps(appRes.data);
@@ -83,7 +83,7 @@ const StudentDashboard = () => {
         // Fetch Enrolled Trainings
         const studentId = localStorage.getItem("userId");
         if (studentId) {
-          const enrollRes = await axios.get(`http://localhost:5000/api/trainings/my-enrollments/${studentId}`);
+          const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
           setEnrolledTrainings(enrollRes.data);
         }
       }
@@ -114,7 +114,7 @@ const StudentDashboard = () => {
     try {
       // Assuming endpoint exists for profile update
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      await axios.put(`http://localhost:5000/api/students/profile/${userInfo.email}`, editForm);
+      await axios.put(`/api/students/profile/${userInfo.email}`, editForm);
       setUser(editForm);
       setIsEditing(false);
       alert("Profile updated successfully! ✨");
