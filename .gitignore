@@ -25,3 +25,4 @@ dist-ssr
 
 # Ignore large MSI files
 src/assets/team/*.msi
+.env

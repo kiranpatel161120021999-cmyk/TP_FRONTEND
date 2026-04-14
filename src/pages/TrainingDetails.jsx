@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   FaLaptopCode,
@@ -25,6 +25,82 @@ import "../style/TrainingDetails.css";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
+// Syncing same Mock Data for Details View
+const MOCK_MODULES = [
+  {
+    _id: "m1",
+    title: "C & C++ Masterclass",
+    subject: "C & C++",
+    duration: "10 Weeks",
+    price: "4999",
+    instructor: "Rajesh Kumar",
+    description: "Complete A-Z Training from basic syntax to advanced pointers and data structures. Teaches all core concepts for competitive programming.",
+    level: "Beginner",
+    syllabus: [
+      { week: 1, title: "Intro & Syntax", description: "Variables, types, and basic I/O.", lessons: 5 },
+      { week: 2, title: "Control Flow", description: "Loops, conditionals, and logic.", lessons: 6 },
+      { week: 3, title: "Functions", description: "Scope, recursion, and modularity.", lessons: 4 },
+      { week: 4, title: "Pointers & DMA", description: "Memory management and addressing.", lessons: 8 }
+    ]
+  },
+  {
+    _id: "m2",
+    title: "Java Full Stack Development",
+    subject: "Java",
+    duration: "12 Weeks",
+    price: "9440",
+    instructor: "Amit Sharma",
+    description: "Comprehensive bootcamp covering Core Java, Spring Boot, Hibernate, and Microservices. A complete hero-to-pro journey.",
+    level: "Intermediate",
+    syllabus: [
+      { week: 1, title: "Core Java Foundations", description: "OOPs concepts, Inheritance, Polymorphism.", lessons: 6 },
+      { week: 2, title: "Collections & Streams", description: "Advanced data handling and functional Java.", lessons: 5 },
+      { week: 3, title: "Spring Boot Intro", description: "Rest APIs and dependency injection.", lessons: 7 },
+      { week: 4, title: "Microservices", description: "Distributed systems and cloud deployment.", lessons: 5 }
+    ]
+  },
+  {
+    _id: "m3",
+    title: "Full Stack Web Mastery",
+    subject: "React",
+    duration: "14 Weeks",
+    price: "12500",
+    instructor: "Sneha Patil",
+    description: "Teaches all modern web technologies: React, Node.js, Express, and MongoDB. Build and deploy 5+ industry-level projects.",
+    level: "Advanced"
+  },
+  {
+    _id: "m4",
+    title: "Python for AI & Data Science",
+    subject: "Python",
+    duration: "12 Weeks",
+    price: "8999",
+    instructor: "Dr. Vikram Singh",
+    description: "From basic Python to Machine Learning and AI. Teaches all industry libraries including NumPy, Pandas, and Scikit-learn.",
+    level: "Intermediate"
+  },
+  {
+    _id: "m5",
+    title: "Cloud Computing with AWS",
+    subject: "Cloud",
+    duration: "8 Weeks",
+    price: "15000",
+    instructor: "Priya Das",
+    description: "Get certified in AWS Cloud Architecture. This course teaches all essential AWS services for modern DevOps workflows.",
+    level: "Advanced"
+  },
+  {
+    _id: "m6",
+    title: "Mobile App Development",
+    subject: "Mobile",
+    duration: "10 Weeks",
+    price: "11000",
+    instructor: "Nitin Verma",
+    description: "Master Flutter and Dart to build cross-platform apps. Complete training for both Android and iOS markets.",
+    level: "Intermediate"
+  }
+];
+
 const TrainingDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,17 +114,36 @@ const TrainingDetails = () => {
     setLoading(true);
     try {
       const studentId = localStorage.getItem("userId");
-      const res = await axios.get(`/api/trainings/${id}`);
-      setCourse(res.data);
+      
+      // Try fetching from API first
+      try {
+        const res = await axios.get(`/api/trainings/${id}`);
+        if (res.data) {
+          setCourse(res.data);
+        } else {
+          throw new Error("Empty data");
+        }
+      } catch (err) {
+        // Fallback to Mock Data if API fails or ID is mock ID
+        const mockCourse = MOCK_MODULES.find(m => m._id === id);
+        if (mockCourse) {
+          setCourse(mockCourse);
+        } else {
+          setCourse(null);
+        }
+      }
 
       if (studentId) {
-        const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
-        const enrolled = enrollRes.data.some(e => e._id === id);
-        setIsEnrolled(enrolled);
+        try {
+          const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
+          const enrolled = enrollRes.data.some(e => e._id === id);
+          setIsEnrolled(enrolled);
+        } catch (e) {
+          console.log("No enrollments found");
+        }
       }
     } catch (err) {
       console.error("Fetch Error:", err);
-      toast.error("Process failed load training data");
     } finally {
       setLoading(false);
     }
@@ -56,7 +151,6 @@ const TrainingDetails = () => {
 
   useEffect(() => {
     fetchTrainingData();
-    // Auto-resume enrollment if coming back from login
     if (searchParams.get("action") === "enroll") {
       setIsPayModalOpen(true);
     }
@@ -65,7 +159,6 @@ const TrainingDetails = () => {
   const handleEnrollClick = () => {
     const studentId = localStorage.getItem("userId");
     if (!studentId) {
-      // Direct redirection to login for a seamless flow
       navigate(`/login?redirect=/training-details/${id}&action=enroll`);
       return;
     }
@@ -86,19 +179,7 @@ const TrainingDetails = () => {
   };
 
   const getVideoLink = (subject, topic) => {
-    if (topic) {
-       return "https://www.youtube.com/results?search_query=" + encodeURIComponent(`${subject} ${topic} tutorial`);
-    }
-    const videoLinks = {
-      "React Native": "https://www.youtube.com/results?search_query=react+native+full+course",
-      "React JS": "https://www.youtube.com/results?search_query=react+js+full+course",
-      "Java": "https://www.youtube.com/results?search_query=java+programming+full+course",
-      "PHP": "https://www.youtube.com/results?search_query=php+full+course+for+beginners",
-      "Python": "https://www.youtube.com/results?search_query=python+full+course",
-      "Full Stack": "https://www.youtube.com/results?search_query=full+stack+web+development+course",
-      "Data Science": "https://www.youtube.com/results?search_query=data+science+full+course"
-    };
-    return videoLinks[subject] || "https://www.youtube.com/results?search_query=" + encodeURIComponent(subject + " full tutorial");
+    return "https://www.youtube.com/results?search_query=" + encodeURIComponent(`${subject} ${topic} tutorial`);
   };
 
   if (loading) return <div className="loader-container"><div className="loader"></div></div>;
@@ -106,9 +187,10 @@ const TrainingDetails = () => {
   if (!course) return (
     <div className="td-page">
       <Header />
-      <div className="td-container error-container">
+      <div className="td-container error-container" style={{padding: '100px 0', textAlign: 'center'}}>
         <h2>Module Not Found</h2>
-        <Link to="/trainings" className="td-back-btn">Return to Catalog</Link>
+        <p>Sorry, we couldn't find the training module you are looking for.</p>
+        <Link to="/trainings" className="td-back-btn" style={{marginTop: '20px', display: 'inline-block', color: '#6d28d9', fontWeight: 'bold'}}>Return to Catalog</Link>
       </div>
       <Footer />
     </div>
@@ -120,7 +202,6 @@ const TrainingDetails = () => {
     <div className="td-page">
       <Header />
 
-      {/* Hero Section */}
       <section className="td-hero">
         <div className="td-hero-bg"></div>
         <div className="td-container">
@@ -136,13 +217,12 @@ const TrainingDetails = () => {
           </div>
           <div className="td-quick-stats">
             <div className="stat-item"><FaClock /> {course.duration}</div>
-            <div className="stat-item"><FaUserTie /> {course.instructor}</div>
+            <div className="stat-item"><FaUserTie /> {course.instructor || "Expert Trainer"}</div>
             <div className="stat-item"><FaSignal /> {course.level}</div>
           </div>
         </div>
       </section>
 
-      {/* Main Content Layout */}
       <section className="td-main">
         <div className="td-container td-layout">
 
@@ -150,7 +230,7 @@ const TrainingDetails = () => {
             <section className="td-section">
               <h2><FaCheckCircle className="sec-icon" /> Module Objectives</h2>
               <div className="td-learn-grid">
-                {["Industry standards", "Hands-on projects", "Cloud deployment", "Expert support"].map((item, index) => (
+                {["Industry standards", "Hands-on projects", "Complete A-Z Mastery", "Expert support"].map((item, index) => (
                   <div className="td-learn-item" key={index}>
                     <FaCheckCircle className="check-icon" />
                     <span>{item}</span>
@@ -161,7 +241,7 @@ const TrainingDetails = () => {
 
             <section className="td-section">
               <div className="flex justify-between items-center mb-8">
-                <h2 className="section-title"><FaLaptopCode className="sec-icon" /> Detailed Learning Roadmap</h2>
+                <h2 className="section-title"><FaLaptopCode className="sec-icon" /> Training Roadmap</h2>
                  <span className="td-syllabus-count">{course.syllabus?.length || 4} Milestone Weeks</span>
               </div>
               
@@ -175,33 +255,26 @@ const TrainingDetails = () => {
                         { week: 1, title: "Foundations & Basics", description: "Learn the core concepts and setup your development environment.", lessons: 5 },
                         { week: 2, title: "Intermediate Concepts", description: "Deep dive into more complex structural patterns and logic modeling.", lessons: 7 },
                         { week: 3, title: "Advanced Topics", description: "Industry-standard project workflows and API integrations.", lessons: 6 },
-                        { week: 4, title: "Deployment Projects", description: "Capstone real-world project deployment and code reviews.", lessons: 4 }
+                        { week: 4, title: "Live Projects & Deployment", description: "Capstone real-world project deployment and code reviews.", lessons: 4 }
                       ];
 
                   return displaySyllabus.map((item, index) => (
-                    <div className="roadmap-node" key={index} style={{ animationDelay: `${index * 0.2}s` }}>
+                    <div className="roadmap-node" key={index}>
                       <div className="roadmap-dot">
                          <div className="dot-inner"></div>
                       </div>
-                      <div className={`roadmap-card card-reveal ${isEnrolled ? 'clickable-card' : ''}`}
+                      <div className={`roadmap-card ${isEnrolled ? 'clickable-card' : ''}`}
                            onClick={(e) => { e.stopPropagation(); isEnrolled && window.open(getUsefulLink(course.subject), "_blank"); }}>
                         <div className="card-header">
                           <span className="week-label">Week {item.week}</span>
                           <h4>{item.title}</h4>
                         </div>
-                        <p className="card-desc">{item.description || "Master industry standards and core concepts for this developmental phase."}</p>
+                        <p className="card-desc">{item.description}</p>
                          <div className="card-footer">
-                            <span className="lesson-info"><FaBookOpen /> {item.lessons || 4} Interactive Lessons</span>
-                            {isEnrolled ? (
-                              <div className="syll-buttons">
-                                <a href="/uploads/1773130692016-resume.pdf" download={`${course.subject}_Notes_Week_${item.week}.pdf`} 
-                                   className="btn-syll-sm" onClick={(e) => e.stopPropagation()}>
-                                    <FaDownload /> Download Study Guide
-                                </a>
-                              </div>
-                            ) : (
-                                <button className="btn-syll-sm outline" onClick={(e) => { e.stopPropagation(); window.open(getVideoLink(course?.subject || "Programming", item.title), "_blank"); }}>
-                                  <FaPlayCircle /> Watch Lesson
+                            <span className="lesson-info"><FaBookOpen /> {item.lessons || 4} Lessons</span>
+                            {!isEnrolled && (
+                                <button className="btn-syll-sm outline" onClick={(e) => { e.stopPropagation(); window.open(getVideoLink(course.subject, item.title), "_blank"); }}>
+                                  <FaPlayCircle /> Preview
                                 </button>
                             )}
                          </div>
@@ -217,60 +290,8 @@ const TrainingDetails = () => {
                   <div className="roadmap-card milestone-card">
                      <h4>Professional Certification</h4>
                      <p>Final project assessment and industry-recognized credential award.</p>
-                     {isEnrolled && (
-                        <button className="btn-certificate-download" 
-                                style={{background: '#6d28d9', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', marginTop: '10px', fontWeight: 'bold'}}
-                                onClick={(e) => { e.stopPropagation(); window.open("/certificate/" + id, "_blank"); }}>
-                          <FaCertificate /> Download Certificate
-                        </button>
-                     )}
                   </div>
                 </div>
-              </div>
-            </section>
-
-            {/* NEW: TECHNOLOGY STACK */}
-            <section className="td-section">
-              <h2 className="section-title">What You'll Master</h2>
-              <div className="tech-stack-grid">
-                {["React", "Node.js", "Express", "MongoDB", "Redux", "TypeScript"].map((tech, i) => (
-                  <div className="tech-item" key={i}>
-                    <FaCheckCircle className="text-indigo-400" /> {tech}
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* NEW: INSTRUCTOR PROFILE */}
-            <section className="td-section instructor-section">
-              <h2 className="section-title">Your Instructor</h2>
-              <div className="instructor-card">
-                <div className="instructor-img">
-                  <div className="img-placeholder">{course.instructor ? course.instructor[0] : 'I'}</div>
-                </div>
-                <div className="instructor-bio">
-                  <h4>{course.instructor || "Industry Expert"}</h4>
-                  <p>Senior Full-Stack Architect with over 12+ years of experience in enterprise development. Passionate about mentoring the next generation of engineers.</p>
-                </div>
-              </div>
-            </section>
-
-            {/* NEW: FAQ SECTION */}
-            <section className="td-section">
-              <h2 className="section-title">Frequently Asked Questions</h2>
-              <div className="faq-accordion">
-                {[
-                  { q: "Is this training fully online?", a: "Yes, it is a self-paced online module with live mentorship sessions." },
-                  { q: "Do I get a certificate?", a: "Upon successful completion of the final project, you receive a verification link for your LinkedIn profile." },
-                  { q: "What are the prerequisites?", a: "Basic understanding of programming logic and variables is recommended." }
-                ].map((faq, i) => (
-                  <div className="faq-item" key={i}>
-                    <div className="faq-question">
-                      <span>{faq.q}</span>
-                    </div>
-                    <div className="faq-answer">{faq.a}</div>
-                  </div>
-                ))}
               </div>
             </section>
           </div>
@@ -289,33 +310,29 @@ const TrainingDetails = () => {
                   </div>
                 </div>
                 <div className="td-info-row">
-                  <div className="info-icon"><FaGraduationCap /></div>
+                  <div className="info-icon"><FaCertificate /></div>
                   <div className="info-text">
                     <span className="info-label">Certificate</span>
-                    <span className="info-value">Included</span>
+                    <span className="info-value">Verified</span>
                   </div>
                 </div>
 
-                <div className="td-action-box">
+                <div className="td-action-box" style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                   {isEnrolled ? (
                     <>
-                      <p>You have full access!</p>
-                      <div className="td-progress-mini" style={{ marginBottom: '15px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#10b981', marginBottom: '4px' }}>Status: 100% (Completed)</div>
-                        <div style={{ height: '6px', background: '#e5e7eb', borderRadius: '3px', overflow: 'hidden' }}><div style={{ width: '100%', height: '100%', background: '#10b981' }}></div></div>
+                      <div style={{ color: '#10b981', fontWeight: 'bold', marginBottom: '15px' }}>
+                        <FaCheckCircle /> You are enrolled!
                       </div>
-                      <Link to={`/training-assignment/${course._id}`} className="td-primary-btn full-width">
-                        Continue to Module <FaExternalLinkAlt />
+                      <Link to={`/training-assignment/${course._id}`} className="td-primary-btn full-width" style={{textAlign: 'center', display: 'block', textDecoration: 'none'}}>
+                        Start Learning Course
                       </Link>
-                      <a href="/uploads/1773130692016-resume.pdf" download={`${course.subject}_Complete_Study_Guide.pdf`}
-                        style={{ marginTop: '10px', display: 'block', textAlign: 'center', textDecoration: 'none', color: '#6d28d9', fontWeight: 'bold', fontSize: '14px' }}>
-                        <FaDownload /> Download Study Guide PDF
-                      </a>
                     </>
                   ) : (
                     <>
-                      <p>Individual Enrollment</p>
-                      <button className="td-primary-btn full-width" onClick={handleEnrollClick}>
+                      <div style={{fontSize: '24px', fontWeight: '800', color: '#1e1b4b', marginBottom: '10px'}}>₹{course.price || "9,440"}</div>
+                      <p style={{fontSize: '14px', color: '#64748b', marginBottom: '20px'}}>Includes lifetime access to all resources and a professional certificate.</p>
+                      <button className="td-primary-btn full-width" style={{background: '#6d28d9', color: '#fff', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', width: '100%'}} 
+                              onClick={handleEnrollClick}>
                         Enroll & Checkout
                       </button>
                     </>
@@ -330,7 +347,7 @@ const TrainingDetails = () => {
       <PaymentModal
         isOpen={isPayModalOpen}
         onClose={() => setIsPayModalOpen(false)}
-        onSuccess={fetchTrainingData}
+        onSuccess={() => { setIsEnrolled(true); setIsPayModalOpen(false); }}
         training={course}
       />
 

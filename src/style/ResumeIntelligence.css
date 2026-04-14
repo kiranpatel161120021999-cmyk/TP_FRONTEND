@@ -310,6 +310,51 @@
 .rr-weaknesses ul li::before { background: #ef4444; }
 
 /* Tips */
+.rr-skills-sec {
+  margin-bottom: 30px;
+  padding: 24px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+.rr-skills-sec h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #64748b;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.skills-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.skill-tag {
+  background: white;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(109,40,217,0.05);
+  transition: 0.2s;
+}
+.skill-tag:hover {
+  transform: translateY(-2px);
+  background: #6d28d9;
+  color: white;
+}
+.no-skills {
+  font-size: 14px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
 .rr-tips-box {
   padding: 24px; border-radius: 16px; background: #f5f3ff; border: 1px solid #ede9fe;
 }

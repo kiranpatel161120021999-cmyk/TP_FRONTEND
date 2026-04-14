@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { FaClock, FaLaptopCode, FaCheckCircle, FaPlayCircle, FaFileAlt, FaCertificate, FaDownload, FaCode, FaLock, FaGraduationCap } from "react-icons/fa";
@@ -7,6 +7,40 @@ import Footer from "../components/Footer";
 import PaymentModal from "../components/PaymentModal";
 
 import "../style/Details.css";
+
+// Syncing same Mock Data for Learning View
+const MOCK_MODULES = [
+  {
+    _id: "m1",
+    title: "C & C++ Masterclass",
+    subject: "C & C++",
+    duration: "10 Weeks",
+    price: "4999",
+    description: "Complete A-Z Training from basic syntax to advanced pointers and data structures. Teaches all core concepts for competitive programming.",
+    level: "Beginner",
+    syllabus: [
+      { week: 1, title: "Intro & Syntax", description: "Variables, types, and basic I/O.", lessons: 5 },
+      { week: 2, title: "Control Flow", description: "Loops, conditionals, and logic.", lessons: 6 },
+      { week: 3, title: "Functions", description: "Scope, recursion, and modularity.", lessons: 4 },
+      { week: 4, title: "Pointers & DMA", description: "Memory management and addressing.", lessons: 8 }
+    ]
+  },
+  {
+    _id: "m2",
+    title: "Java Full Stack Development",
+    subject: "Java",
+    duration: "12 Weeks",
+    price: "9440",
+    description: "Comprehensive bootcamp covering Core Java, Spring Boot, Hibernate, and Microservices. A complete hero-to-pro journey.",
+    level: "Intermediate",
+    syllabus: [
+      { week: 1, title: "Core Java Foundations", description: "OOPs concepts, Inheritance, Polymorphism.", lessons: 6 },
+      { week: 2, title: "Collections & Streams", description: "Advanced data handling and functional Java.", lessons: 5 },
+      { week: 3, title: "Spring Boot Intro", description: "Rest APIs and dependency injection.", lessons: 7 },
+      { week: 4, title: "Microservices", description: "Distributed systems and cloud deployment.", lessons: 5 }
+    ]
+  }
+];
 
 const Details = () => {
   const { id } = useParams();
@@ -22,15 +56,22 @@ const Details = () => {
     try {
       const studentId = localStorage.getItem("userId");
       
-      // 1. Fetch Training Details
-      const courseRes = await axios.get(`/api/trainings/${id}`);
-      setCourse(courseRes.data);
+      // Try API
+      try {
+        const courseRes = await axios.get(`/api/trainings/${id}`);
+        setCourse(courseRes.data);
+      } catch {
+        // Fallback to Mock
+        const mock = MOCK_MODULES.find(m => m._id === id);
+        if (mock) setCourse(mock);
+      }
 
-      // 2. Check Enrollment if student is logged in
       if (studentId) {
-        const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
-        const enrolled = enrollRes.data.some(e => e._id === id);
-        setIsEnrolled(enrolled);
+        try {
+          const enrollRes = await axios.get(`/api/trainings/my-enrollments/${studentId}`);
+          const enrolled = enrollRes.data.some(e => e._id === id);
+          setIsEnrolled(enrolled);
+        } catch { console.log("No enrollments"); }
       }
     } catch (err) {
       console.error("Fetch Data Error:", err);
@@ -41,7 +82,6 @@ const Details = () => {
 
   useEffect(() => {
     fetchCourseAndEnrollment();
-    // Auto-resume enrollment if coming back from login
     if (searchParams.get("action") === "enroll") {
        setIsPayOpen(true);
     }
@@ -49,28 +89,15 @@ const Details = () => {
 
   const handleEnrollClick = () => {
     const studentId = localStorage.getItem("userId");
-    
     if (!studentId) {
-       // Direct redirection to login for a seamless flow
        navigate(`/login?redirect=/training-assignment/${id}&action=enroll`);
        return;
     }
-    
-    // User is logged in -> Open payment instantly
     setIsPayOpen(true);
   };
 
   const getUsefulLink = (subject) => {
-    const links = {
-      "React Native": "https://reactnative.dev/docs/getting-started",
-      "React JS": "https://react.dev/",
-      "Java": "https://docs.oracle.com/javase/tutorial/",
-      "PHP": "https://www.php.net/manual/en/",
-      "Python": "https://docs.python.org/3/tutorial/",
-      "Full Stack": "https://developer.mozilla.org/en-US/docs/Learn",
-      "Data Science": "https://www.kaggle.com/learn"
-    };
-    return links[subject] || "https://www.google.com/search?q=" + encodeURIComponent(subject + " documentation");
+    return "https://www.google.com/search?q=" + encodeURIComponent(subject + " documentation");
   };
 
   if (loading) return <div className="loader-container"><div className="loader"></div></div>;
@@ -81,7 +108,7 @@ const Details = () => {
         <Header />
         <div className="cd-container" style={{padding: '100px 0', textAlign: 'center'}}>
           <h2>Course Not Found</h2>
-          <Link to="/trainings" className="btn-enroll-primary" style={{display: 'inline-block', width: 'auto', marginTop: '20px'}}>Back to Trainings</Link>
+          <Link to="/trainings" className="btn-enroll-primary" style={{display: 'inline-block', width: 'auto', marginTop: '20px', background: '#6d28d9', color: '#fff', textDecoration: 'none', padding: '10px 20px', borderRadius: '8px'}}>Back to Trainings</Link>
         </div>
         <Footer />
       </div>
@@ -92,7 +119,6 @@ const Details = () => {
     <div className="course-details-page">
       <Header />
 
-      {/* HERO OVERVIEW */}
       <section className="cd-hero">
         <div className="cd-container cd-hero-flex">
           <div className="cd-hero-left">
@@ -109,22 +135,14 @@ const Details = () => {
         </div>
       </section>
 
-      {/* MAIN CONTENT */}
       <section className="cd-main">
         <div className="cd-container cd-grid">
           
           <div className="cd-content-left">
-            {/* Video Player Section */}
             {isEnrolled ? (
               <div className="cd-section-box video-section">
-                <h2>{course.videoUrl ? "Course Overview Video" : "Module Introduction (Preview)"}</h2>
+                <h2>Module Introduction</h2>
                 <div className="video-wrapper">
-                  {course.videoUrl ? (
-                    <video controls width="100%">
-                      <source src={`${course.videoUrl}`} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  ) : (
                     <iframe 
                       width="100%" 
                       height="400" 
@@ -135,7 +153,6 @@ const Details = () => {
                       allowFullScreen
                       style={{borderRadius: '12px'}}
                     ></iframe>
-                  )}
                 </div>
               </div>
             ) : (
@@ -148,82 +165,64 @@ const Details = () => {
               </div>
             )}
 
-            {/* Syllabus Roadmap */}
             <div className="cd-section-box">
-              <div className="flex justify-between items-center mb-8">
-                 <h2 className="section-title"><FaLaptopCode className="sec-icon" /> Module Roadmap</h2>
-                 {!isEnrolled && <span className="text-amber-500 font-bold flex items-center gap-2"><FaLock /> Enrollment Required</span>}
-              </div>
-              
+              <h2 className="section-title"><FaLaptopCode className="sec-icon" /> Module Roadmap</h2>
               <div className="roadmap-container">
                 <div className="roadmap-track"></div>
-                
-                {(() => {
-                  const displaySyllabus = course.syllabus && course.syllabus.length > 0 
-                    ? course.syllabus 
-                    : [
-                        { week: 1, title: "Foundations & Setup", description: "Master the core environmental configuration and basic syntax.", lessons: 5 },
-                        { week: 2, title: "Architecture & Logic", description: "Deep dive into structural patterns and core module logic.", lessons: 8 },
-                        { week: 3, title: "Advanced Integration", description: "Connecting external services and optimizing performance.", lessons: 6 }
-                      ];
-
-                  return displaySyllabus.map((item, index) => {
-                    const isCompleted = isEnrolled && index < 0; 
-                    const isCurrent = isEnrolled && index === 0;
-                    
-                    return (
-                      <div className={`roadmap-node ${!isEnrolled ? 'locked' : ''}`} key={index}>
-                        <div className={`roadmap-dot ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
-                           {isCompleted ? <FaCheckCircle /> : <div className="dot-inner"></div>}
-                        </div>
-                        <div className={`roadmap-card ${isEnrolled ? 'clickable-card' : ''}`}
-                             onClick={(e) => { e.stopPropagation(); isEnrolled && window.open(getUsefulLink(course.subject), "_blank"); }}>
-                          <div className="card-header">
-                            <span className="week-label">Week {item.week}</span>
-                            <h4>{item.title}</h4>
-                            {!isEnrolled && <FaLock className="text-gray-300" />}
-                          </div>
-                          <p className="card-desc">{item.description}</p>
-                          
-                          {isEnrolled ? (
-                            <div className="card-footer">
-                              <span className="lesson-info"><FaFileAlt /> {item.lessons || 4} Lessons</span>
-                              <div className="syll-buttons">
-                                <a href={`/uploads/1773130692016-resume.pdf`} download={`${course.subject}_Notes_Week_${item.week}.pdf`} className="btn-syll-sm" onClick={(e) => e.stopPropagation()}>
-                                    <FaDownload /> Download Study Guide
-                                </a>
-                                <button className="btn-syll-sm outline" onClick={(e) => { e.stopPropagation(); window.open(getUsefulLink(course.subject), "_blank"); }}>
-                                  <FaPlayCircle /> Watch Lesson
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="card-footer locked-footer">
-                               <p>Enroll to unlock this milestone</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  });
-                })()}
-
-                {course.syllabus?.length > 0 && (
-                  <div className="roadmap-node milestone">
-                    <div className="roadmap-dot milestone-dot">
-                       <FaGraduationCap />
+                                {(course.syllabus || [
+                  { week: 1, title: "Foundations", description: "Core concepts and environment setup.", lessons: 5 },
+                  { week: 2, title: "Core Logic", description: "Structural patterns and algorithms.", lessons: 8 }
+                ]).map((item, index) => (
+                  <div className={`roadmap-node ${!isEnrolled ? 'locked' : ''}`} key={index}>
+                    <div className="roadmap-dot">
+                       {isEnrolled ? <FaCheckCircle /> : <div className="dot-inner"></div>}
                     </div>
-                    <div className="roadmap-card milestone-card">
-                       <h4>Course Completion</h4>
-                       <p>Final project review and certification.</p>
-                       {isEnrolled && (
-                          <button className="btn-certificate-download" onClick={() => window.open("/certificate/" + id, "_blank")}>
-                            <FaCertificate /> Download Certificate
-                          </button>
-                       )}
+                    <div className={`roadmap-card ${isEnrolled ? 'clickable-card' : ''}`}>
+                      <div className="card-header">
+                        <span className="week-label">Week {item.week}</span>
+                        <h4>{item.title}</h4>
+                        {!isEnrolled && <FaLock />}
+                      </div>
+                      <p className="card-desc">{item.description}</p>
+                      {isEnrolled && (
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                          <a
+                            href={item.videoUrl || "https://www.youtube.com/results?search_query=" + encodeURIComponent((course.title || '') + " " + (item.title || '') + " tutorial")}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '6px',
+                              padding: '7px 14px', borderRadius: '8px', textDecoration: 'none',
+                              background: '#f5f3ff', color: '#6d28d9', fontWeight: '700',
+                              fontSize: '12px', border: '1.5px solid #ddd6fe', transition: 'all 0.2s'
+                            }}
+                            onMouseOver={e => { e.currentTarget.style.background='#6d28d9'; e.currentTarget.style.color='white'; }}
+                            onMouseOut={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9'; }}
+                          >
+                            <FaPlayCircle /> Video
+                          </a>
+                          <a
+                            href={item.notesUrl || "https://www.google.com/search?q=" + encodeURIComponent((course.title || '') + " " + (item.title || '') + " notes PDF")}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '6px',
+                              padding: '7px 14px', borderRadius: '8px', textDecoration: 'none',
+                              background: '#fefce8', color: '#92400e', fontWeight: '700',
+                              fontSize: '12px', border: '1.5px solid #fde68a', transition: 'all 0.2s'
+                            }}
+                            onMouseOver={e => { e.currentTarget.style.background='#f59e0b'; e.currentTarget.style.color='white'; }}
+                            onMouseOut={e => { e.currentTarget.style.background='#fefce8'; e.currentTarget.style.color='#92400e'; }}
+                          >
+                            <FaDownload /> Notes
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </div>
@@ -232,55 +231,69 @@ const Details = () => {
             <div className="cd-sticky-sidebar">
               {isEnrolled ? (
                 <div className="cd-enroll-card success-card">
-                  <div className="enroll-img success">
-                    <FaCheckCircle className="enroll-play-icon" />
-                    <p>Training Active</p>
-                  </div>
                   <div className="enroll-body">
                     <h3>You're Admitted!</h3>
-                    <p>Your enrollment was successful. You have lifetime access to these resources and certificate updates.</p>
-                    <div className="progress-bar-container">
-                       <div className="progress-label">Course Progress: 100% (Completed)</div>
-                       <div className="progress-bg"><div className="progress-fill" style={{width: '100%', background: '#10b981'}}></div></div>
-                    </div>
+                    <p>Start your learning journey now with full resource access.</p>
                     <button className="btn-enroll-primary success" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
                       Resume Module
                     </button>
-                    <a href="/uploads/1773130692016-resume.pdf" download="Essential_Course_Guide.pdf" className="btn-enroll-outline" style={{marginTop: '10px', display: 'block', textAlign: 'center', textDecoration: 'none', background: '#f5f3ff', color: '#6d28d9', padding: '10px', borderRadius: '8px', fontWeight: 'bold'}}>
-                      <FaDownload /> Essential Guide PDF
-                    </a>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
+                      <a
+                        href={course.videoUrl || "https://www.youtube.com/results?search_query=" + encodeURIComponent((course.title || '') + " tutorial")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                          padding: '14px 10px', borderRadius: '12px', textDecoration: 'none',
+                          background: '#f5f3ff', border: '2px solid #ddd6fe', color: '#6d28d9',
+                          fontWeight: '700', fontSize: '13px', transition: 'all 0.3s'
+                        }}
+                        onMouseOver={e => { e.currentTarget.style.background='#6d28d9'; e.currentTarget.style.color='white'; }}
+                        onMouseOut={e => { e.currentTarget.style.background='#f5f3ff'; e.currentTarget.style.color='#6d28d9'; }}
+                      >
+                        <FaPlayCircle style={{ fontSize: '22px' }} />
+                        Video Lecture
+                      </a>
+                      <a
+                        href={course.notesUrl || course.fileUrl || "https://www.google.com/search?q=" + encodeURIComponent((course.title || '') + " notes PDF download")}
+                        download={course.notesUrl || course.fileUrl ? `${course.title}-notes.pdf` : undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                          padding: '14px 10px', borderRadius: '12px', textDecoration: 'none',
+                          background: '#fefce8', border: '2px solid #fde68a', color: '#92400e',
+                          fontWeight: '700', fontSize: '13px', transition: 'all 0.3s'
+                        }}
+                        onMouseOver={e => { e.currentTarget.style.background='#f59e0b'; e.currentTarget.style.color='white'; }}
+                        onMouseOut={e => { e.currentTarget.style.background='#fefce8'; e.currentTarget.style.color='#92400e'; }}
+                      >
+                        <FaDownload style={{ fontSize: '22px' }} />
+                        Notes PDF
+                      </a>
+                    </div>
                   </div>
                 </div>
               ) : (
                 <div className="cd-enroll-card">
-                  <div className="enroll-img">
-                    <FaPlayCircle className="enroll-play-icon" />
-                    <p>Start Your Journey</p>
-                  </div>
                   <div className="enroll-body">
                     <h3>₹{course.price || "9,440"}</h3>
                     <p>Gain full access to video lectures, syllabus PDFs, and a verified certificate.</p>
-                    <button className="btn-enroll-primary" onClick={handleEnrollClick}>
+                    <button className="btn-enroll-primary" onClick={handleEnrollClick} style={{background: '#6d28d9', color: '#fff', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', width: '100%'}}>
                       Enroll & Pay Now
                     </button>
-                    <ul className="enroll-features">
-                      <li><FaCheckCircle className="ef-icon" /> On-demand Video</li>
-                      <li><FaCheckCircle className="ef-icon" /> Weekly Syllabus PDFs</li>
-                      <li><FaCheckCircle className="ef-icon" /> Career Guidance</li>
-                    </ul>
                   </div>
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </section>
 
       <PaymentModal 
         isOpen={isPayOpen} 
         onClose={() => setIsPayOpen(false)} 
-        onSuccess={fetchCourseAndEnrollment}
+        onSuccess={() => { setIsEnrolled(true); }}
         training={course} 
       />
 
