@@ -18,6 +18,9 @@ const CompanyDashboard = () => {
   const [candidates, setCandidates] = useState([]);
   const [appFilter, setAppFilter] = useState("All");
   const [showJobModal, setShowJobModal] = useState(false);
+  const [showSubscription, setShowSubscription] = useState(false);
+  const [subStatus, setSubStatus] = useState("Active");
+  const [billingPage, setBillingPage] = useState("overview");
   const [newJob, setNewJob] = useState({ title: "", location: "", package: "", type: "Full Time", deadline: "" });
   const [editJobData, setEditJobData] = useState(null); // null = closed
 
@@ -277,6 +280,118 @@ const CompanyDashboard = () => {
     );
   };
 
+  const renderProfile = () => (
+    <div className="cd-dashboard-view animate-in">
+      <div className="cd-section-header">
+        <div>
+          <div className="cd-section-title">Company Profile</div>
+          <div className="cd-section-sub">Manage your corporate identity and public details</div>
+        </div>
+        <button className="cd-btn-primary"><FaBuilding /> Edit Profile</button>
+      </div>
+
+      <div className="cd-profile-layout">
+        {/* Main Column */}
+        <div className="cd-profile-main-col">
+          <div className="cd-profile-card">
+            <div className="cd-profile-banner"></div>
+            <div className="cd-profile-content">
+              <div className="cd-profile-header-strip">
+                 <div className="cd-profile-avatar-large">{user?.name?.[0]?.toUpperCase() || "C"}</div>
+                 <div className="cd-profile-actions">
+                    <span className="cd-verified-badge"><FaCheckCircle/> Verified Profile</span>
+                 </div>
+              </div>
+              
+              <div className="cd-profile-main-info">
+                <h2>{user?.name || "Premium Recruiter"}</h2>
+                <p className="cd-profile-role">Established Corporate Partner since 2026</p>
+              </div>
+              
+              <div className="cd-profile-section-title">Corporate Details</div>
+              
+              <div className="cd-profile-grid">
+                <div className="cd-profile-field">
+                  <label>Company Name</label>
+                  <div className="cd-field-value-pro">
+                    <FaBuilding className="field-icon"/> 
+                    <div>
+                      <div className="field-val-text">{user?.name || "Premium Recruiter"}</div>
+                      <div className="field-sub-text">Registered Business Name</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="cd-profile-field">
+                  <label>Corporate Email</label>
+                  <div className="cd-field-value-pro">
+                    <FaUserTie className="field-icon"/> 
+                    <div>
+                      <div className="field-val-text">{user?.email || "recruitment@company.com"}</div>
+                      <div className="field-sub-text">Primary Contact</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="cd-profile-field">
+                  <label>Industry</label>
+                  <div className="cd-field-value-pro">
+                    <FaChartLine className="field-icon" style={{background: '#eff6ff', color: '#2563eb'}}/> 
+                    <div>
+                      <div className="field-val-text">Information Technology</div>
+                      <div className="field-sub-text">Software & Tech Services</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="cd-profile-field">
+                  <label>Headquarters</label>
+                  <div className="cd-field-value-pro">
+                    <FaMapMarkerAlt className="field-icon" style={{background: '#fef2f2', color: '#ef4444'}}/> 
+                     <div>
+                      <div className="field-val-text">Bangalore, India</div>
+                      <div className="field-sub-text">Global HQ</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="cd-profile-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>Company Overview</label>
+                  <div className="cd-field-value-pro overview-field">
+                    We are a leading tech organization committed to building innovative solutions. We actively recruit top engineering talent and provide an environment built on professional growth, cutting-edge technology, and unparalleled teamwork. Our mission is to accelerate the transition to sustainable digital infrastructure.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Side Column */}
+        <div className="cd-profile-side-col">
+          <div className="cd-side-card">
+             <h3>Account Status</h3>
+             <div className="cd-account-tier" style={subStatus === 'Canceled' ? {background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', boxShadow: 'none'} : {}}>
+               <div className="tier-icon" style={subStatus === 'Canceled' ? {color: '#94a3b8'} : {}}>★</div>
+               <div className="tier-info">
+                 <strong>Enterprise Plan</strong>
+                 <span>{subStatus === 'Active' ? 'Active Subscription' : 'Canceled Subscription'}</span>
+               </div>
+             </div>
+             <p className="tier-desc">
+               {subStatus === 'Active' ? 'You have unlimited access to post jobs and search candidate pipelines.' : 'Your plan will expire soon. Reactivate to keep unlimited access.'}
+             </p>
+             <button className="cd-btn-outline" style={{width: '100%', marginTop: '12px'}} onClick={() => { setShowSubscription(true); setBillingPage('overview'); }}>Manage Subscription</button>
+          </div>
+
+          <div className="cd-side-card">
+             <h3>Recruitment Stats</h3>
+             <ul className="cd-stat-list">
+               <li><span>Total Jobs Posted</span> <strong>{jobs.length}</strong></li>
+               <li><span>Total Applicants</span> <strong>{candidates.length}</strong></li>
+               <li><span>Candidates Hired</span> <strong>{candidates.filter(c => c.status === "Placed").length}</strong></li>
+             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="cd-layout">
 
@@ -352,10 +467,11 @@ const CompanyDashboard = () => {
               {page === "dashboard" && renderDashboard()}
               {page === "jobs" && renderJobs()}
               {page === "candidates" && renderCandidates()}
-              {(page === "profile" || page === "analytics") && (
+              {page === "profile" && renderProfile()}
+              {page === "analytics" && (
                 <div className="cd-empty" style={{ marginTop: "60px" }}>
-                  <FaBuilding />
-                  <p>This section is coming soon.</p>
+                  <FaChartLine />
+                  <p>Analytics coming soon.</p>
                 </div>
               )}
             </>
@@ -441,6 +557,86 @@ const CompanyDashboard = () => {
               </div>
               <button type="submit" className="cd-submit-btn">💾 Save Changes</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── SUBSCRIPTION MODAL ── */}
+      {showSubscription && (
+        <div className="cd-modal-overlay" onClick={() => setShowSubscription(false)}>
+          <div className="cd-modal" style={{maxWidth: '450px', textAlign: 'center'}} onClick={e => e.stopPropagation()}>
+            <button className="cd-modal-close" onClick={() => setShowSubscription(false)}><FaTimes /></button>
+            
+            {billingPage === "overview" && (
+              <>
+                <div className="tier-icon" style={{margin: '0 auto 16px', background: '#fef3c7', color: '#d97706', width: '60px', height: '60px', fontSize: '28px'}}>★</div>
+                <div className="cd-modal-title">Enterprise Plan</div>
+                <div className="cd-modal-sub" style={{marginBottom: '24px'}}>Your corporate subscription is {subStatus === 'Active' ? 'perfectly active' : 'canceled and will not renew'}.</div>
+                
+                <div style={{background: '#f8fafc', padding: '20px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #e2e8f0', textAlign: 'left'}}>
+                   <h4 style={{marginBottom: '6px', fontSize: '13px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px'}}>Billing Cycle</h4>
+                   <p style={{color: subStatus === 'Active' ? '#16a34a' : '#ef4444', fontWeight: '900', fontSize: '22px', marginBottom: '16px'}}>
+                     {subStatus} <span style={{fontSize: '14px', color: '#94a3b8', fontWeight: '500'}}>{subStatus === 'Active' ? 'Billed Annually' : 'Ends Jan 01'}</span>
+                   </p>
+                   
+                   <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px', borderBottom: '1px dashed #cbd5e1', paddingBottom: '10px', marginBottom: '10px'}}>
+                      <span style={{color: '#64748b'}}>Plan Limit</span>
+                      <strong style={{color: '#1e293b'}}>Unlimited Posts</strong>
+                   </div>
+                   <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px'}}>
+                      <span style={{color: '#64748b'}}>{subStatus === 'Active' ? 'Renewal Date' : 'Access Until'}</span>
+                      <strong style={{color: '#1e293b'}}>01 Jan 2027</strong>
+                   </div>
+                </div>
+                
+                <button className="cd-submit-btn" style={{marginTop: '0'}} onClick={() => setBillingPage('hub')}>
+                  Open Secure Billing Hub
+                </button>
+              </>
+            )}
+
+            {billingPage === "hub" && (
+                <div style={{textAlign: 'left', animation: 'fadeIn 0.2s ease'}}>
+                   <h2 style={{fontSize: '20px', fontWeight: '800', marginBottom: '20px', color: '#1e293b'}}>Billing Hub</h2>
+                   
+                   <div style={{marginBottom: '20px'}}>
+                     <h3 style={{fontSize: '12px', color: '#64748b', marginBottom: '10px', textTransform:'uppercase', fontWeight: 700}}>Payment Method</h3>
+                     <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc'}}>
+                        <div style={{background: '#1e293b', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold'}}>VISA</div>
+                        <div>
+                          <div style={{fontWeight: '700', fontSize: '14px', color: '#1e293b'}}>•••• •••• •••• 4242</div>
+                          <div style={{fontSize: '12px', color: '#64748b'}}>Expires 12/28</div>
+                        </div>
+                     </div>
+                   </div>
+
+                   <div style={{marginBottom: '28px'}}>
+                     <h3 style={{fontSize: '12px', color: '#64748b', marginBottom: '10px', textTransform:'uppercase', fontWeight: 700}}>Recent Invoices</h3>
+                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0'}}>
+                        <span style={{fontSize: '14px', fontWeight: '600', color: '#1e293b'}}>Jan 01, 2026</span>
+                        <div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+                          <span style={{fontSize: '14px', fontWeight: '700'}}>$1,200.00</span>
+                          <span style={{fontSize: '12px', background: '#dcfce7', color: '#16a34a', padding: '2px 8px', borderRadius: '100px', fontWeight: '700'}}>Paid</span>
+                        </div>
+                     </div>
+                   </div>
+
+                   <div style={{display: 'flex', gap: '12px'}}>
+                     {subStatus === 'Active' ? (
+                       <button className="cd-btn-outline" style={{flex: 1, borderColor: '#ef4444', color: '#ef4444'}} onClick={() => {
+                         setSubStatus("Canceled");
+                         setBillingPage("overview");
+                       }}>Cancel Plan</button>
+                     ) : (
+                       <button className="cd-btn-primary" style={{flex: 1, background: '#16a34a', border: 'none'}} onClick={() => {
+                         setSubStatus("Active");
+                         setBillingPage("overview");
+                       }}>Reactivate Plan</button>
+                     )}
+                     <button className="cd-btn-outline" style={{flex: 1}} onClick={() => setBillingPage("overview")}>Back</button>
+                   </div>
+                </div>
+            )}
           </div>
         </div>
       )}

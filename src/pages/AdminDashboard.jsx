@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
@@ -6,7 +6,7 @@ import {
   FileText, Upload, Trash2, RefreshCcw, Search, CheckCircle, 
   XCircle, Loader2, Users, Building, Briefcase, Plus, Edit, 
   Trash, LogOut, ChevronRight, Navigation, Shield, Mail, Key,
-  MapPin, Layers, DollarSign, Calendar, Cpu, Image, Award, Type
+  MapPin, Layers, DollarSign, Calendar, Cpu, Image, Award, Type, MessageSquare, Settings
 } from 'lucide-react';
 import { FaChartPie, FaUsers, FaBuilding, FaBriefcase, FaSignOutAlt, FaPlus, FaSearch } from "react-icons/fa";
 import "../style/AdminDashboard.css"; 
@@ -20,6 +20,9 @@ function AdminDashboard() {
   const [pdfs, setPdfs] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+  const [mockSessions, setMockSessions] = useState([]);
   
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -89,12 +92,15 @@ function AdminDashboard() {
     { id: 'add-training', label: "Add Training", icon: <FaPlus size={14} /> },
     { id: 'add-job', label: "Add Job", icon: <Briefcase size={14} /> },
     { id: 'add-users', label: "Add Users", icon: <Users size={14} /> },
-    { id: 'admin-report', label: "Admin Report", icon: <Shield size={14} /> },
-    { id: 'students-report', label: "Students Report", icon: <Users size={14} /> },
-    { id: 'tpo-report', label: "TPO Report", icon: <Building size={14} /> },
-    { id: 'training-report', label: "Training Report", icon: <FileText size={14} /> },
-    { id: 'job-report', label: "Job Report", icon: <Briefcase size={14} /> },
-    { id: 'job-registration', label: "Job Registration", icon: <CheckCircle size={14} /> },
+    { id: 'placement-roster', label: "Placement Roster v2.0", icon: <Users size={14} /> },
+    { id: 'training-roi', label: "Training ROI & Progress", icon: <FileText size={14} /> },
+    { id: 'application-funnel', label: "Application Funnel Metrics", icon: <Layers size={14} /> },
+    { id: 'mock-feedback', label: "Mock Interview Feedback", icon: <MessageSquare size={14} /> },
+    { id: 'corporate-ledger', label: "Corporate Engagement Ledger", icon: <Building size={14} /> },
+    { id: 'student-matrix', label: "Student Engagement Matrix", icon: <Cpu size={14} /> },
+    { id: 'financial-audit', label: "Financial & Enrollment Audit", icon: <DollarSign size={14} /> },
+    { id: 'global-reports', label: "Global Snapshot History", icon: <Layers size={14} /> },
+    { id: 'report-registry', label: "Report Specification Ledger", icon: <FileText size={14} /> },
     { id: 'training-registration', label: "Training Registration", icon: <Edit size={14} /> },
     { id: 'my-account', label: "My Account", icon: <Key size={14} /> },
     { id: 'change-password', label: "Change Password", icon: <Key size={14} /> },
@@ -104,13 +110,16 @@ function AdminDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [stud, comp, train, pdfRes, jobRes, appRes] = await Promise.all([
+      const [stud, comp, train, pdfRes, jobRes, appRes, reportRes, enrollRes, mockRes] = await Promise.all([
         axios.get("/api/students").catch(() => ({ data: [] })),
         axios.get("/api/companies").catch(() => ({ data: [] })),
         axios.get("/api/trainings").catch(() => ({ data: [] })),
         axios.get("/api/syllabus").catch(() => ({ data: [] })),
         axios.get("/api/jobs").catch(() => ({ data: [] })),
-        axios.get("/api/applications").catch(() => ({ data: [] }))
+        axios.get("/api/applications").catch(() => ({ data: [] })),
+        axios.get("/api/reports").catch(() => ({ data: [] })),
+        axios.get("/api/enrollments").catch(() => ({ data: [] })),
+        axios.get("/api/mock-interview/sessions").catch(() => ({ data: [] }))
       ]);
       setStudents(stud.data || []);
       setCompanies(comp.data || []);
@@ -118,6 +127,9 @@ function AdminDashboard() {
       setPdfs(pdfRes.data || []);
       setJobs(jobRes.data || []);
       setApplications(appRes.data || []);
+      setReports(reportRes.data || []);
+      setEnrollments(enrollRes.data || []);
+      setMockSessions(mockRes.data || []);
     } catch (error) {
       console.error("API Error:", error);
       toast.error("Failed to sync live data");
@@ -252,6 +264,28 @@ function AdminDashboard() {
       toast.success("Syllabus removed");
     } catch {
       toast.error("Failed to delete");
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    const loadingToast = toast.loading("Generating system snapshot...");
+    try {
+      const res = await axios.post("/api/reports/generate");
+      setReports([res.data, ...reports]);
+      toast.success("Report generated successfully!", { id: loadingToast });
+    } catch {
+      toast.error("Generation failed", { id: loadingToast });
+    }
+  };
+
+  const handleDeleteReport = async (id) => {
+    if (!window.confirm("Delete this report?")) return;
+    try {
+      await axios.delete(`/api/reports/${id}`);
+      setReports(reports.filter(r => r._id !== id));
+      toast.success("Report archived and removed.");
+    } catch {
+      toast.error("Deletion failed");
     }
   };
 
@@ -607,40 +641,45 @@ function AdminDashboard() {
     </div>
   );
 
-  const renderStudentsReport = () => GenericTableCard({
-    title: "Global Candidate Roster",
-    columns: ["Candidate Identity", "Platform Email", "Degree/Course", "Status"],
+  const renderPlacementRoster = () => GenericTableCard({
+    title: "01 - Placement Roster v2.0",
+    columns: ["Candidate Identity", "Placement Target", "Financial Package", "Mission Status"],
     data: students,
     renderRow: (s) => (
       <tr key={s._id} className="modern-table-row">
          <td>
             <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-               <div className="avatar-soft-gradient" style={{ background: 'linear-gradient(135deg, #6366f1, #4338ca)' }}>{s.name?.[0] || '?'}</div>
-               <div className="name-cell"><strong>{s.name || 'Anonymous Student'}</strong><span>User ID: {s._id?.substring(0,8)}</span></div>
+               <div className="avatar-soft-gradient" style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)' }}>{s.name?.[0] || '?'}</div>
+               <div className="name-cell"><strong>{s.name || 'Anonymous Student'}</strong><span>{s.branch || 'General'} | {s.year}</span></div>
             </div>
          </td>
-         <td><span className="role-text" style={{ fontStyle: 'italic', color: '#64748b' }}>{s.email}</span></td>
-         <td><span className="date-text" style={{ fontWeight: '700' }}>{s.course || 'Unassigned'}</span></td>
-         <td><div className="status-pill-v6 interview"><div style={{width:'6px',height:'6px',borderRadius:'50%',background:'currentColor'}}></div>Active</div></td>
+         <td><span className="role-text" style={{ fontStyle: 'italic' }}>{s.placedCompany || 'Awaiting Offer'}</span></td>
+         <td><span className="date-text" style={{ fontWeight: '900', color: 'var(--tp-primary)' }}>{s.salary || '—'}</span></td>
+         <td>
+            <div className={`status-pill-v6 ${s.placed ? 'interview' : 'submitted'}`}>
+               <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'currentColor'}}></div>
+               {s.placed ? 'Successfully Placed' : 'Searching Opportunity'}
+            </div>
+         </td>
       </tr>
     )
   });
 
-  const renderTpoReport = () => GenericTableCard({
-    title: "Placement Corporate Partners",
-    columns: ["Corporate Entity", "Recruiter Email", "Hiring Contact", "Status"],
+  const renderCorporateLedger = () => GenericTableCard({
+    title: "05 - Corporate Engagement Ledger",
+    columns: ["Corporate Entity", "Recruiter Intelligence", "Contact Node", "Engagement Status"],
     data: companies,
     renderRow: (c) => (
       <tr key={c._id} className="modern-table-row">
          <td>
             <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-               <div className="avatar-soft-gradient" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>{c.name?.[0] || '?'}</div>
-               <div className="name-cell"><strong>{c.name || 'Corporate Partner'}</strong><span>Corporate Partner</span></div>
+               <div className="avatar-soft-gradient" style={{ background: '#3b82f6' }}>{c.name?.[0] || '?'}</div>
+               <div className="name-cell"><strong>{c.name || 'Corporate'}</strong><span>Recruitment Partner</span></div>
             </div>
          </td>
          <td><span className="role-text" style={{ fontWeight: '600' }}>{c.email}</span></td>
-         <td><span className="date-text" style={{ color: '#64748b' }}>{c.phone || 'N/A'}</span></td>
-         <td><div className="status-pill-v6 interview"><div style={{width:'6px',height:'6px',borderRadius:'50%',background:'currentColor'}}></div>Verified</div></td>
+         <td><span className="date-text">{c.phone || 'N/A'}</span></td>
+         <td><div className="status-pill-v6 interview">Verified Partner</div></td>
       </tr>
     )
   });
@@ -761,57 +800,201 @@ function AdminDashboard() {
     </div>
   );
 
-  const renderTrainingReport = () => GenericTableCard({
-    title: "Training Modules Performance",
-    columns: ["Course Pipeline", "Subject Core", "Duration Matrix", "Price"],
+  const renderTrainingRoi = () => GenericTableCard({
+    title: "02 - Training ROI & Progress",
+    columns: ["Course Module", "Domain Core", "Session Load", "Market Price"],
     data: trainings,
     renderRow: (t) => (
       <tr key={t._id} className="modern-table-row">
          <td>
             <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-               <div className="avatar-soft-gradient" style={{ background: 'linear-gradient(135deg, #10b981, #047857)' }}>{t.title?.[0] || '?'}</div>
-               <div className="name-cell"><strong>{t.title || 'Training Program'}</strong><span>Live Course</span></div>
+               <div className="avatar-soft-gradient" style={{ background: '#10b981' }}>{t.title?.[0] || '?'}</div>
+               <div className="name-cell"><strong>{t.title || 'Module'}</strong><span>Educational Asset</span></div>
             </div>
          </td>
-         <td><span className="role-text" style={{ color: '#64748b', fontWeight: '600' }}>{t.subject}</span></td>
-         <td><span className="date-text" style={{ fontWeight: '700' }}>{t.duration}</span></td>
-         <td><div style={{ fontWeight: '950', color: 'var(--admin-primary)', fontSize: '16px' }}>₹{t.price}</div></td>
+         <td><span className="role-text">{t.subject}</span></td>
+         <td><span className="date-text" style={{ fontWeight: '800' }}>{t.duration}</span></td>
+         <td><div style={{ fontWeight: '950', color: 'var(--tp-primary)' }}>₹{t.price}</div></td>
       </tr>
     )
   });
 
-  const renderJobRegistration = () => GenericTableCard({
-    title: "Candidate Job Registrations",
-    columns: ["Applicant Identity", "Applying To", "Corporate End-Target", "Status"],
+  const renderApplicationFunnel = () => GenericTableCard({
+    title: "03 - Application Funnel Metrics",
+    columns: ["Applicant Identity", "Applying To", "Corporate End-Target", "Workflow Stage"],
     data: applications,
-    renderRow: (a) => {
-      const isVerified = a.name?.toLowerCase().includes("verified user");
-      const cleanName = a.name?.replace(/verified user/gi, "").trim();
-      
-      return (
-        <tr key={a._id} className="modern-table-row">
-           <td>
-              <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                 <div className="avatar-soft-gradient">
-                    {cleanName ? cleanName[0] : (a.name ? a.name?.[0] : '?')}
-                 </div>
-                 <div className="name-cell">
-                    <strong>{cleanName || a.name || 'Anonymous candidate'}</strong>
-                    {isVerified && <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={10} /> Verified Identity</span>}
-                 </div>
-              </div>
-           </td>
-           <td><span className="role-text" style={{ fontWeight: '700', color: 'var(--admin-navy)' }}>{a.role || 'General Application'}</span></td>
-           <td><span className="date-text" style={{ color: '#64748b', fontWeight: '600' }}>{a.company || 'Direct Hire'}</span></td>
-           <td>
-              <div className={`status-pill-v6 ${a.status?.toLowerCase() === 'shortlisted' ? 'interview' : 'submitted'}`}>
-                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></div>
-                 {a.status || "Provisionally Submitted"}
-              </div>
-           </td>
-        </tr>
-      );
-    }
+    renderRow: (a) => (
+      <tr key={a._id} className="modern-table-row">
+         <td>
+            <div className="table-comp-cell" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+               <div className="avatar-soft-gradient" style={{ background: '#f59e0b' }}>{a.name?.[0] || '?'}</div>
+               <strong>{a.name || 'Anonymous candidate'}</strong>
+            </div>
+         </td>
+         <td><span className="role-text">{a.role || 'Position'}</span></td>
+         <td><span className="date-text">{a.company || 'Direct'}</span></td>
+         <td>
+            <div className={`status-pill-v6 ${a.status?.toLowerCase()==='shortlisted'?'interview':'submitted'}`}>
+               {a.status || "In Review"}
+            </div>
+         </td>
+      </tr>
+    )
+  });
+
+  const renderGlobalReports = () => (
+    <div className="dash-body animate-in">
+       <div className="page-header" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontSize: '28px', fontWeight: '950', letterSpacing: '-1px', color: 'var(--admin-navy)', margin: 0 }}>Administrative Decision Metrics</h2>
+            <p style={{ color: 'var(--tp-muted)', fontWeight: '600' }}>Historical record of generated system intelligence reports</p>
+          </div>
+          <button onClick={handleGenerateReport} className="primary-btn-pro" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px' }}>
+            <Cpu size={18}/> Generate Snapshot
+          </button>
+       </div>
+
+       <div className="pro-card" style={{ padding: '0', overflow: 'hidden' }}>
+          <table className="modern-pro-table">
+            <thead>
+              <tr>
+                <th>Report Title</th>
+                <th>Classification</th>
+                <th>Generated On</th>
+                <th>Metrics Snapshot</th>
+                <th style={{ textAlign: 'right' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.length > 0 ? reports.map(r => (
+                <tr key={r._id} className="modern-table-row">
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                       <div style={{ padding: '10px', background: '#f1f5f9', borderRadius: '10px' }}><FileText size={16} color="#475569" /></div>
+                       <strong>{r.title}</strong>
+                    </div>
+                  </td>
+                  <td><div className="status-pill active-pill">{r.type}</div></td>
+                  <td><span className="date-text">{new Date(r.createdAt).toLocaleDateString()}</span></td>
+                  <td>
+                    <div style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                       {r.data && Object.keys(r.data).map(key => (
+                         <span key={key} style={{ background: '#f8fafc', padding: '2px 8px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                           {key.replace(/([A-Z])/g, ' $1')}: <strong>{r.data[key]}</strong>
+                         </span>
+                       ))}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button onClick={() => handleDeleteReport(r._id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}>
+                       <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '60px' }}>
+                     <Layers size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
+                     <p style={{ fontWeight: '700', color: '#94a3b8' }}>No historical reports found. Click generate to start tracking.</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+       </div>
+    </div>
+  );
+
+  const renderReportRegistry = () => (
+    <div className="dash-body animate-in">
+       <div className="page-header" style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: '950', letterSpacing: '-1px', color: 'var(--admin-navy)' }}>System Report Specification Ledger</h2>
+          <p style={{ color: 'var(--tp-muted)', fontWeight: '600' }}>Directory of intelligence modules and their structural formats</p>
+       </div>
+
+       <div className="pro-card" style={{ padding: '0', overflow: 'hidden' }}>
+          <table className="modern-pro-table">
+            <thead>
+              <tr style={{ background: 'var(--tp-primary)', color: 'white' }}>
+                <th style={{ color: 'white' }}>Sr. No</th>
+                <th style={{ color: 'white' }}>Report Name</th>
+                <th style={{ color: 'white' }}>Mission Objective / Description</th>
+                <th style={{ color: 'white' }}>Access Hierarchy</th>
+                <th style={{ color: 'white' }}>Format / Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: "Placement Roster v2.0", desc: "Detailed breakdown of successfully placed candidates, packages, and tenure.", access: "Admin, TPO", format: "Excel / PDF / JSON" },
+                { name: "Training ROI Analysis", desc: "Correlation between course completion rates and placement success.", access: "Admin, TPO, Trainers", format: "Visual Chart / CSV" },
+                { name: "Application Funnel Metrics", desc: "Conversion tracking from initial application to final offer letter.", access: "Admin, TPO, Companies", format: "Dynamic Dashboard" },
+                { name: "Candidate Skill Matrix", desc: "Aggregated mock interview scores and technical competency heatmaps.", access: "Admin, TPO", format: "Interactive Table" },
+                { name: "Drive Engagement Log", desc: "Historical record of company participation and hiring frequency.", access: "Admin", format: "System Audit Log" },
+                { name: "Attendance & Finance", desc: "Payment status for premium courses and drive registration fees.", access: "Finance, Admin", format: "Encrypted Ledger" }
+              ].map((r, i) => (
+                <tr key={i} className="modern-table-row">
+                  <td style={{ fontWeight: '800', color: 'var(--tp-primary)' }}>{(i + 1).toString().padStart(2, '0')}</td>
+                  <td><strong>{r.name}</strong></td>
+                  <td style={{ fontStyle: 'italic', color: '#64748b', fontSize: '13px' }}>{r.desc}</td>
+                  <td>
+                    {r.access.split(',').map(role => (
+                      <span key={role} className="status-pill submitted" style={{ fontSize: '10px', marginRight: '4px' }}>{role.trim()}</span>
+                    ))}
+                  </td>
+                  <td><div className="status-pill active-pill"> {r.format} </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+       </div>
+    </div>
+  );
+
+  const renderMockFeedback = () => GenericTableCard({
+    title: "04 - Mock Interview Feedback",
+    columns: ["Candidate Identity", "Interview Domain", "AI Technical Score", "Mission Outcome"],
+    data: mockSessions,
+    renderRow: (s) => (
+      <tr key={s._id} className="modern-table-row">
+         <td><strong>{s.studentName || 'Anonymous Student'}</strong></td>
+         <td><span className="role-text">{s.category}</span></td>
+         <td><div style={{ fontWeight: '900', color: '#10b981' }}>{s.score}% Match</div></td>
+         <td><div className="status-pill active-pill">Analyzed</div></td>
+      </tr>
+    )
+  });
+
+  const renderStudentMatrix = () => GenericTableCard({
+    title: "06 - Student Engagement Matrix",
+    columns: ["Student Entity", "Institutional Log", "Intelligence Activity", "Current Standing"],
+    data: students.slice(0, 10),
+    renderRow: (s, i) => (
+      <tr key={s._id} className="modern-table-row">
+         <td><strong>{s.name}</strong></td>
+         <td><span className="role-text">{s.email}</span></td>
+         <td><div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px' }}><div style={{ width: `${60 + (i*4)}%`, height: '100%', background: 'var(--tp-primary)', borderRadius: '4px' }}></div></div></td>
+         <td><div className="status-pill active-pill">Active Node</div></td>
+      </tr>
+    )
+  });
+
+  const renderFinancialAudit = () => GenericTableCard({
+    title: "07 - Financial & Enrollment Audit",
+    columns: ["Transaction Intelligence", "Student Identity", "Training Resource", "Audit Amount", "Flow Status"],
+    data: enrollments,
+    renderRow: (e) => (
+      <tr key={e._id} className="modern-table-row">
+         <td><span style={{ fontFamily: 'var(--tp-font-mono)', fontWeight: '800', color: 'var(--tp-muted)', fontSize: '11px' }}>{e.transactionId || 'LEGACY_TXN'}</span></td>
+         <td><strong>{e.studentName || 'Student Identity'}</strong></td>
+         <td><span className="role-text" style={{ color: '#6366f1' }}>{e.trainingTitle}</span></td>
+         <td><div style={{ fontWeight: '900', color: 'var(--tp-dark)' }}>₹{e.amount?.toLocaleString() || '0'}</div></td>
+         <td>
+            <div className={`status-pill-v6 ${e.status?.toLowerCase()==='completed' ? 'interview' : (e.status?.toLowerCase()==='active' ? 'submitted' : 'inactive')}`}>
+               {e.status || "In Transit"}
+            </div>
+         </td>
+      </tr>
+    )
   });
 
   /* MOCK: Because trainings lack an explicit full 'my-enrollments' tracking node per DB, we simulate a global tracker mapping students to stats */
@@ -960,12 +1143,14 @@ function AdminDashboard() {
       case "syllabus": return renderSyllabusManager(); // Fallback
       case "add-job": return renderAddJob();
       case "add-users": return renderAddUsers();
-      case "admin-report": return renderAdminReport();
-      case "students-report": return renderStudentsReport();
-      case "tpo-report": return renderTpoReport();
-      case "training-report": return renderTrainingReport();
-      case "job-report": return renderJobReport();
-      case "job-registration": return renderJobRegistration();
+      case "placement-roster": return renderPlacementRoster();
+      case "training-roi": return renderTrainingRoi();
+      case "application-funnel": return renderApplicationFunnel();
+      case "mock-feedback": return renderMockFeedback();
+      case "corporate-ledger": return renderCorporateLedger();
+      case "student-matrix": return renderStudentMatrix();
+      case "financial-audit": return renderFinancialAudit();
+      case "report-registry": return renderReportRegistry();
       case "training-registration": return renderTrainingRegistration();
       case "my-account": return renderMyAccount();
       case "change-password": return renderChangePassword();

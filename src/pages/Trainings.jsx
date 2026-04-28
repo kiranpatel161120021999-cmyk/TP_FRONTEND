@@ -8,7 +8,7 @@ import '../style/Training.css';
 // Legacy Mock Data for Programming Modules
 const MOCK_MODULES = [
   {
-    _id: "m1",
+    _id: "661f4b1d9c2d0a1b2c3d4e51",
     title: "C & C++ Masterclass",
     subject: "C & C++",
     duration: "10 Weeks",
@@ -17,7 +17,7 @@ const MOCK_MODULES = [
     level: "Beginner"
   },
   {
-    _id: "m2",
+    _id: "661f4b1d9c2d0a1b2c3d4e52",
     title: "Java Full Stack Development",
     subject: "Java",
     duration: "12 Weeks",
@@ -26,7 +26,7 @@ const MOCK_MODULES = [
     level: "Intermediate"
   },
   {
-    _id: "m3",
+    _id: "661f4b1d9c2d0a1b2c3d4e53",
     title: "Full Stack Web Mastery",
     subject: "React",
     duration: "14 Weeks",
@@ -35,7 +35,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m4",
+    _id: "661f4b1d9c2d0a1b2c3d4e54",
     title: "Python for AI & Data Science",
     subject: "Python",
     duration: "12 Weeks",
@@ -44,7 +44,7 @@ const MOCK_MODULES = [
     level: "Intermediate"
   },
   {
-    _id: "m5",
+    _id: "661f4b1d9c2d0a1b2c3d4e55",
     title: "Cloud Computing with AWS",
     subject: "Cloud",
     duration: "8 Weeks",
@@ -53,7 +53,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m6",
+    _id: "661f4b1d9c2d0a1b2c3d4e56",
     title: "Mobile App Development",
     subject: "Mobile",
     duration: "10 Weeks",
@@ -62,7 +62,7 @@ const MOCK_MODULES = [
     level: "Intermediate"
   },
   {
-    _id: "m7",
+    _id: "661f4b1d9c2d0a1b2c3d4e57",
     title: "Cyber Security Essentials",
     subject: "Security",
     duration: "8 Weeks",
@@ -71,7 +71,7 @@ const MOCK_MODULES = [
     level: "Beginner"
   },
   {
-    _id: "m8",
+    _id: "661f4b1d9c2d0a1b2c3d4e58",
     title: "DevOps & CI/CD Masterclass",
     subject: "DevOps",
     duration: "12 Weeks",
@@ -80,7 +80,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m9",
+    _id: "661f4b1d9c2d0a1b2c3d4e59",
     title: "UI/UX Design for Tech",
     subject: "Design",
     duration: "6 Weeks",
@@ -89,7 +89,7 @@ const MOCK_MODULES = [
     level: "Beginner"
   },
   {
-    _id: "m10",
+    _id: "661f4b1d9c2d0a1b2c3d4e60",
     title: "Data Engineering with SQL",
     subject: "Data",
     duration: "10 Weeks",
@@ -98,7 +98,7 @@ const MOCK_MODULES = [
     level: "Intermediate"
   },
   {
-    _id: "m11",
+    _id: "661f4b1d9c2d0a1b2c3d4e61",
     title: "AI & ML Specialization",
     subject: "AI",
     duration: "16 Weeks",
@@ -107,7 +107,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m12",
+    _id: "661f4b1d9c2d0a1b2c3d4e62",
     title: "Blockchain Mastery",
     subject: "Blockchain",
     duration: "10 Weeks",

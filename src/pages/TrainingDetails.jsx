@@ -28,7 +28,7 @@ import { toast } from "react-hot-toast";
 // Syncing same Mock Data for Details View
 const MOCK_MODULES = [
   {
-    _id: "m1",
+    _id: "661f4b1d9c2d0a1b2c3d4e51",
     title: "C & C++ Masterclass",
     subject: "C & C++",
     duration: "10 Weeks",
@@ -44,7 +44,7 @@ const MOCK_MODULES = [
     ]
   },
   {
-    _id: "m2",
+    _id: "661f4b1d9c2d0a1b2c3d4e52",
     title: "Java Full Stack Development",
     subject: "Java",
     duration: "12 Weeks",
@@ -60,7 +60,7 @@ const MOCK_MODULES = [
     ]
   },
   {
-    _id: "m3",
+    _id: "661f4b1d9c2d0a1b2c3d4e53",
     title: "Full Stack Web Mastery",
     subject: "React",
     duration: "14 Weeks",
@@ -70,7 +70,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m4",
+    _id: "661f4b1d9c2d0a1b2c3d4e54",
     title: "Python for AI & Data Science",
     subject: "Python",
     duration: "12 Weeks",
@@ -80,7 +80,7 @@ const MOCK_MODULES = [
     level: "Intermediate"
   },
   {
-    _id: "m5",
+    _id: "661f4b1d9c2d0a1b2c3d4e55",
     title: "Cloud Computing with AWS",
     subject: "Cloud",
     duration: "8 Weeks",
@@ -90,7 +90,7 @@ const MOCK_MODULES = [
     level: "Advanced"
   },
   {
-    _id: "m6",
+    _id: "661f4b1d9c2d0a1b2c3d4e56",
     title: "Mobile App Development",
     subject: "Mobile",
     duration: "10 Weeks",

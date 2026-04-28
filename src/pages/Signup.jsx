@@ -46,8 +46,8 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post("/api/auth/send-otp", { 
-        email: formData.email.trim() 
+      const response = await axios.post("https://tp-backend-2o94.onrender.com/api/auth/send-otp", {
+        email: formData.email.trim()
       });
       showPopup("Verify Email 📧", response.data.message || "Enter the 6-digit code sent to your academic inbox.", "success");
       setAuthStep(1);
@@ -207,7 +207,7 @@ const Signup = () => {
                 </div>
 
                 <button type="submit" className="btn-primary" disabled={loading}>
-                  {loading ? "Initializing..." : "Proceed to Verify"} <FaArrowRight style={{marginLeft:'8px'}} />
+                  {loading ? "Initializing..." : "Proceed to Verify"} <FaArrowRight style={{ marginLeft: '8px' }} />
                 </button>
 
                 <div className="divider-v5">
@@ -252,12 +252,12 @@ const Signup = () => {
                   {loading ? "Verifying..." : "Complete Registration"} <FaRocket style={{ marginLeft: '8px' }} />
                 </button>
 
-                <button type="button" className="btn-link" onClick={() => setAuthStep(0)} style={{marginTop:'16px', display:'block', margin:'16px auto'}}>
+                <button type="button" className="btn-link" onClick={() => setAuthStep(0)} style={{ marginTop: '16px', display: 'block', margin: '16px auto' }}>
                   ← Back to Details
                 </button>
 
-                <p style={{textAlign: 'center', marginTop: '20px', fontSize: '13px', color: '#64748b'}}>
-                  Didn't get the code? <span style={{color: 'var(--auth-primary)', cursor: 'pointer', fontWeight: 600}}>Resend OTP</span>
+                <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: '#64748b' }}>
+                  Didn't get the code? <span style={{ color: 'var(--auth-primary)', cursor: 'pointer', fontWeight: 600 }}>Resend OTP</span>
                 </p>
               </form>
             )}
@@ -267,7 +267,7 @@ const Signup = () => {
             Already have an account?{" "}
             <Link to="/login" className="link">Sign in</Link>
           </div>
-          
+
           <button className="btn-secondary" onClick={() => navigate("/")}>
             Back to Home
           </button>
@@ -285,12 +285,12 @@ const Signup = () => {
       {popup.show && (
         <div className="popup">
           <div className="popup-box">
-             <div className={`popup-icon ${popup.type === 'error' ? 'error' : ''}`}>
-               {popup.type === 'error' ? <FaTimes /> : <FaCheck />}
-             </div>
-             <h3>{popup.title}</h3>
-             <p>{popup.message}</p>
-             <button className="popup-btn" onClick={closePopup}>Continue</button>
+            <div className={`popup-icon ${popup.type === 'error' ? 'error' : ''}`}>
+              {popup.type === 'error' ? <FaTimes /> : <FaCheck />}
+            </div>
+            <h3>{popup.title}</h3>
+            <p>{popup.message}</p>
+            <button className="popup-btn" onClick={closePopup}>Continue</button>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -278,7 +278,12 @@ const StudentDashboard = () => {
       </div>
 
       <div className="companies-row">
-        {companies.length > 0 ? companies.map((c, i) => (
+        {loading ? (
+          <div className="loading-state-box">
+            <div className="loader-mini"></div>
+            <p>Fetching corporate directory...</p>
+          </div>
+        ) : companies.length > 0 ? companies.map((c, i) => (
           <div className="company-info-card" key={i}>
             <div className="c-logo">{c.name[0]}</div>
             <div className="c-content">
@@ -294,9 +299,9 @@ const StudentDashboard = () => {
             </button>
           </div>
         )) : (
-          <div className="loading-state-box">
-            <div className="loader-mini"></div>
-            <p>Fetching corporate directory...</p>
+          <div className="empty-state-box" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '80px 0' }}>
+            <FaBuilding style={{ fontSize: '48px', opacity: '0.2', marginBottom: '15px', color: 'var(--tp-primary)' }} />
+            <p>No corporate partners found.</p>
           </div>
         )}
       </div>
@@ -315,7 +320,12 @@ const StudentDashboard = () => {
         </div>
       </div>
       <div className="jobs-list-full">
-        {jobs.length > 0 ? jobs.map((job, i) => (
+        {loading ? (
+           <div className="loading-state-box">
+            <div className="loader-mini"></div>
+            <p>Scanning for live opportunities...</p>
+          </div>
+        ) : jobs.length > 0 ? jobs.map((job, i) => (
           <div key={i} className="data-card job-premium-card">
             <div className="job-premium-main">
               <div className="job-logo-box">{job.companyId?.name?.[0] || 'J'}</div>
@@ -343,10 +353,10 @@ const StudentDashboard = () => {
             </div>
           </div>
         )) : (
-           <div className="loading-state-box">
-            <div className="loader-mini"></div>
-            <p>Scanning for live opportunities...</p>
-          </div>
+           <div className="empty-state-box" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '80px 0' }}>
+             <FaBriefcase style={{ fontSize: '48px', opacity: '0.2', marginBottom: '15px', color: 'var(--tp-primary)' }} />
+             <p>No live opportunities found at the moment.</p>
+           </div>
         )}
       </div>
     </div>
